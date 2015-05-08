@@ -1,0 +1,14 @@
+obj-$(CONFIG_MMP_PANEL_MDNIE)           += mmp-panel-mdnie.o
+obj-$(CONFIG_MMP_PANEL_BACKLIGHT)       += mmp-panel-backlight.o
+obj-$(CONFIG_MMP_PANEL_TFT_GENERIC)     += mmp-dsi-panel.o
+obj-$(CONFIG_MMP_PANEL_TPOHVGA)         += tpo_tj032md01bw.o
+obj-$(CONFIG_MMP_PANEL_NT35565)         += mipi_nt35565.o
+obj-$(CONFIG_MMP_PANEL_EA8868B)         += mipi-ea8868b.o smart_mtp_ea8868.o
+obj-$(CONFIG_MMP_PANEL_R63311)          += mipi_r63311.o
+obj-$(CONFIG_MMP_PANEL_LG4591)          += mipi_lg4591.o
+obj-$(CONFIG_MMP_PANEL_OTM1281A)        += mipi_otm1281a.o
+obj-$(CONFIG_MMP_PANEL_TD043MGEA1)      += paral_td043mgea1.o
+obj-$(CONFIG_MMP_PANEL_NT35510)         += mipi-nt35510.o
+obj-$(CONFIG_MMP_PANEL_S6D7AA0X)        += mipi-s6d7aa0x.o
+obj-$(CONFIG_MMP_PANEL_SC7798A)         += mipi-sc7798a.o
+obj-$(CONFIG_MMP_PANEL_TFT1080P_1E)     += mipi_tft10801920_1e.o

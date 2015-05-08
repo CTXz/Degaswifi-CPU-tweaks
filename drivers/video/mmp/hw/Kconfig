@@ -1,0 +1,50 @@
+if MMP_DISP
+
+config MMP_DISP_CONTROLLER
+	bool "mmp display controller hw support"
+	default y
+	help
+		Marvell MMP display hw controller support
+
+config MMP_DISP_DFC
+	bool "mmp display controller dfc support"
+	depends on MMP_DISP_CONTROLLER
+	default n
+	help
+		Marvell MMP display freqency change feature support
+		change between pll1 and pll3, this config shoud used
+		with DIP channel solution together
+
+config MMP_DISP_SPI
+	bool "mmp display controller spi port"
+	depends on MMP_DISP_CONTROLLER && SPI_MASTER
+	default y
+	help
+		Marvell MMP display hw controller spi port support
+		will register as a spi master for panel usage
+
+config MMP_VIRTUAL_RESOLUTION
+	bool "support virtual resulution"
+	depends on MMP_DISP_CONTROLLER
+	default n
+	help
+		Enable virtual resolution feature to support simulate
+		some resolution which current panel can't support or
+		no such panel of resolution
+
+config MMP_VIRTUAL_RESOLUTION_X
+	int "virtual resolution x (0~1920)"
+	depends on MMP_VIRTUAL_RESOLUTION
+	range 0 1920
+	default 720
+	help
+		Set the x resolution for virtual resolution
+
+config MMP_VIRTUAL_RESOLUTION_Y
+	int "virtual resolution y (0~1920)"
+	depends on MMP_VIRTUAL_RESOLUTION
+	range 0 1920
+	default 1280
+	help
+		Set the y resolution for virtual resolution
+endif

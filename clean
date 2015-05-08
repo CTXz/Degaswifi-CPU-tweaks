@@ -1,0 +1,5 @@
+#!/bin/bash
+rm -frv build
+make clean && make mrproper
+echo -en "\e[H\e[J\e[3J"
+echo Ready !

@@ -1,0 +1,412 @@
+/*
+ *  Copyright (C) 2013 Marvell Technology Group Ltd.
+ *  Author: Chao Xie <chao.xie@marvell.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License version 2 as
+ *  publishhed by the Free Software Foundation.
+ */
+
+/memreserve/ 0x09000000 0x01000000;
+/include/ "skeleton.dtsi"
+#include "pxa988-pinfunc.h"
+#include "pxa988-pm.h"
+#include <dt-bindings/usb/mv_usb_phy.h>
+
+/ {
+	interrupt-parent = <&gic>;
+
+	aliases {
+		serial0 = &uart1;
+		serial1 = &uart2;
+		serial2 = &uart3;
+		i2c0 = &twsi1;
+		i2c1 = &twsi2;
+		mmp-camera0 = &ccic1;
+	};
+
+	cpus {
+		cpu@0 {
+			compatible = "arm,cortex-a9";
+			next-level-cache = <&L2>;
+		};
+		cpu@1 {
+			compatible = "arm,cortex-a9";
+			next-level-cache = <&L2>;
+		};
+	};
+
+	gic: interrupt-controller@d1dfe100 {
+		compatible = "arm,cortex-a9-gic";
+		interrupt-controller;
+		#interrupt-cells = <3>;
+		reg = <0xd1dff000 0x1000>,
+		      <0xd1dfe100 0x0100>;
+	};
+
+	L2: l2-cache-controller@d1dfb000 {
+		compatible = "arm,pl310-cache";
+		reg = <0xd1dfb000 0x1000>;
+		arm,data-latency = <2 1 1>;
+		arm,tag-latency = <2 1 1>;
+		arm,pwr-dynamic-clk-gating;
+		arm,pwr-standby-mode;
+		cache-unified;
+		cache-level = <2>;
+	};
+
+	local-timer@d1dfe600 {
+		compatible = "arm,cortex-a9-twd-timer";
+		reg = <0xd1dfe600 0x20>;
+		interrupts = <1 13 0x304>;
+	};
+
+	soc {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "simple-bus";
+		interrupt-parent = <&gic>;
+		ranges;
+
+		ddr@c0100000 {  /* DDR memory controller */
+			compatible = "marvell,devfreq-ddr";
+			reg = <0xc0100000 0x45c>;
+			status = "disabled";
+		};
+
+		axi@d4200000 {	/* AXI */
+			compatible = "mrvl,axi-bus", "simple-bus";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			reg = <0xd4200000 0x00200000>;
+			ranges;
+
+			intc: wakeupgen@d4282000 {
+				compatible = "mrvl,mmp-intc-wakeupgen";
+				reg = <0xd4282000 0x1000>,
+				      <0xd4282800 0x12c>;
+				mrvl,intc-nr-irqs = <64>;
+				mrvl,intc-gbl-mask = <0x114 0x3
+						     0x144 0x3>;
+				mrvl,intc-for-cp = <0 31 32>;
+				mrvl,intc-wake-clr = <9  (1 << 3)
+						      39 (1 << 0 | 1 << 1 | 1 << 6)>;
+			};
+
+			usbphy: usbphy@d4207000 {
+				compatible = "marvell,usb2-phy-40lp";
+				reg = <0xd4207000 0x200>;
+				status = "disabled";
+			};
+
+			udc: udc@d4208100 {
+				compatible = "marvell,mv-udc";
+				reg = <0xd4208100 0x200>;
+				interrupts = <0 44 0x4>;
+				status = "disabled";
+				lpm-qos = <PM_QOS_CPUIDLE_BLOCK_AXI>;
+			};
+
+			dsi: dsi@d420b800 {
+				compatible = "marvell,mmp-dsi";
+				reg = <0xd420b800 0x1ec>;
+				status = "disabled";
+			};
+
+			disp: disp@d420b000 {
+				compatible = "marvell,mmp-disp";
+				reg = <0xd420b000 0x1fc>;
+				lpm-qos = <PM_QOS_CPUIDLE_BLOCK_DDR>;
+				interrupts = <0 41 0x4>;
+				status = "disabled";
+			};
+
+			fb: fb {
+				compatible = "marvell,mmp-fb";
+				status = "disabled";
+			};
+
+			ehci: ehci@d4208100 {
+				compatible = "marvell,mv-ehci";
+				reg = <0xd4208100 0x200>;
+				interrupts = <0 44 0x4>;
+				status = "disabled";
+			};
+
+			sdh3: sdh@d4281000 {
+				compatible = "mrvl,pxav3-mmc";
+				reg = <0xd4281000 0x120>;
+				interrupts = <0 39 0x4>;
+				status = "disabled";
+			};
+
+			sdh1: sdh@d4280000 {
+				compatible = "mrvl,pxav3-mmc";
+				reg = <0xd4280000 0x120>;
+				interrupts = <0 39 0x4>;
+				status = "disabled";
+			};
+
+			sdh2: sdh@d4280800 {
+				compatible = "mrvl,pxav3-mmc";
+				reg = <0xd4280800 0x120>;
+				interrupts = <0 39 0x4>;
+				status = "disabled";
+			};
+
+			ccic1: ccic@d420a000 {
+				compatible = "marvell,mmp-ccic";
+				reg = <0xd420a000 0x2ff>, <0xd4282800 0x1ff>;
+				reg-names = "ccic-regs", "apmu-regs";
+				dma-burst = <64>;
+				mclk-src = <3>;
+				mclk-div = <17>;
+				interrupts = <0 42 0x4>;
+				status = "disable";
+			};
+
+			area51_isp: area51_isp@0xD420F000 {
+				compatible = "marvell, AREA51-ISP";
+				reg = <0xD420F000 0xFFFF>;
+				reg-name = "area51-regs";
+				interrupts = <0 15 0x4>;
+				status = "disabled";
+			};
+
+			area51_ipc: area51_ipc@0xD4240000 {
+				compatible = "marvell, uio-area51";
+				reg = <0xD4240000 0x3FFFF>;
+				status = "disabled";
+			};
+		};
+
+		apb@d4000000 {	/* APB */
+			compatible = "mrvl,apb-bus", "simple-bus";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			reg = <0xd4000000 0x00200000>;
+			ranges;
+
+			pdma0: pdma@d4000000 {
+				compatible = "marvell,pdma-1.0";
+				reg = <0xd4000000 0x10000>;
+				interrupts = <0 47 0x4>;
+				#dma-cells= <1>;
+				#dma-channels = <32>;
+				status = "disabled";
+			};
+
+			timer0: timer@d4014000 {
+				compatible = "marvell,mmp-timer";
+				reg = <0xd4014000 0xc8>;
+				marvell,timer-id = <0>;
+				marvell,timer-flag = <0>;
+				marvell,timer-fc_freq = <3250000>;
+				marvell,timer-apb_freq = <26000000>;
+
+				counter0 {
+					interrupts = <0 13 0x4>;
+					marvell,timer-counter-id = <0>;
+					marvell,timer-counter-cpu = <0>;
+					marvell,timer-counter-cnt_freq = <32768>;
+					marvell,timer-counter-usage = <2>;
+					marvell,timer-counter-cnt_rating = <200>;
+					marvell,timer-counter-mode = <1>;
+				};
+
+				counter1 {
+					interrupts = <0 14 0x4>;
+					marvell,timer-counter-id = <1>;
+					marvell,timer-counter-cpu = <0>;
+					marvell,timer-counter-cnt_freq = <32768>;
+					marvell,timer-counter-usage = <1>;
+					marvell,timer-counter-cnt_rating = <200>;
+					marvell,timer-counter-mode = <0>;
+				};
+
+				counter2 {
+					interrupts = <0 14 0x4>;
+					marvell,timer-counter-id = <2>;
+					marvell,timer-counter-cpu = <0>;
+					marvell,timer-counter-cnt_freq = <3250000>;
+					marvell,timer-counter-usage = <8>;
+					marvell,timer-counter-cnt_rating = <200>;
+					marvell,timer-counter-mode = <0>;
+				};
+			};
+
+			uart1: uart@d4017000 {
+				compatible = "mrvl,mmp-uart";
+				reg = <0xd4017000 0x1000>;
+				interrupts = <0 27 0x4>;
+				dmas = <&pdma0 21
+					&pdma0 22>;
+				dma-names = "rx", "tx";
+				status = "disabled";
+			};
+
+			uart2: uart@d4018000 {
+				compatible = "mrvl,mmp-uart";
+				reg = <0xd4018000 0x1000>;
+				interrupts = <0 28 0x4>;
+				dmas = <&pdma0 23
+					&pdma0 24>;
+				dma-names = "rx", "tx";
+				status = "disabled";
+			};
+
+			uart3: uart@d4036000 {
+				compatible = "mrvl,mmp-uart";
+				reg = <0xd4036000 0x1000>;
+				interrupts = <0 59 0x4>;
+				dmas = <&pdma0 4
+					&pdma0 5>;
+				dma-names = "rx", "tx";
+				status = "disabled";
+			};
+
+			gpio: gpio@d4019000 {
+				compatible = "marvell,mmp-gpio";
+				#address-cells = <1>;
+				#size-cells = <1>;
+				reg = <0xd4019000 0x800>;
+				gpio-controller;
+				#gpio-cells = <2>;
+				interrupts = <0 49 0x4>;
+				interrupt-names = "gpio_mux";
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				ranges;
+
+				gcb0: gpio@d4019000 {
+					reg = <0xd4019000 0x4>;
+				};
+
+				gcb1: gpio@d4019004 {
+					reg = <0xd4019004 0x4>;
+				};
+
+				gcb2: gpio@d4019008 {
+					reg = <0xd4019008 0x4>;
+				};
+
+				gcb3: gpio@d4019100 {
+					reg = <0xd4019100 0x4>;
+				};
+			};
+
+			edgewakeup: edgewakeup@d4019800 {
+				compatible = "mrvl,mmp-edge-wakeup";
+				reg = <0xd4019800 0x10>;
+				status = "disabled";
+			};
+
+			twsi1: i2c@d4011000 {
+				compatible = "mrvl,mmp-twsi";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0xd4011000 0x1000>;
+				interrupts = <0 7 0x4>;
+				mrvl,i2c-fast-mode;
+				status = "disabled";
+			};
+
+			twsi2: i2c@d4037000 {
+				compatible = "mrvl,mmp-twsi";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				reg = <0xd4037000 0x1000>;
+				interrupts = <0 54 0x4>;
+				status = "disabled";
+			};
+
+			rtc: rtc@d4010000 {
+				compatible = "mrvl,mmp-rtc";
+				reg = <0xd4010000 0x100>;
+				interrupts = <0 5 0x4>,<0 6 0x4>;
+				interrupt-names = "rtc 1Hz", "rtc alarm";
+				status = "disabled";
+			};
+
+			keypad: keypad@d4012000 {
+				compatible = "marvell,pxa27x-keypad";
+				reg = <0xd4012000 0x4c>;
+				lpm-qos = <PM_QOS_CPUIDLE_BLOCK_DDR>;
+				interrupts = <0 9 0x4>;
+				status = "disabled";
+			};
+
+			ssp0: ssp@d401b000 {
+				compatible = "mrvl,pxa910-ssp";
+				reg = <0xd401b000 0x90>;
+				ssp-id = <1>;
+				interrupts = <0 3 0x4>;
+			};
+
+			ssp1: ssp@d42a0c00 {
+				compatible = "mrvl,pxa910-ssp";
+				reg = <0xd42a0c00 0x90>;
+				ssp-id = <2>;
+				interrupts = <0 2 0x4>;
+			};
+
+			ssp4: ssp@d4039000 {
+				compatible = "mrvl,pxa910-ssp";
+				reg = <0xd4039000 0x90>;
+				ssp-id = <5>;
+				interrupts = <0 34 0x4>;
+			};
+
+			pmx: pinmux@d401e000 {
+				compatible = "pinconf-single";
+				reg = <0xd401e000 0x330>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+				#gpio-range-cells = <3>;
+				ranges;
+
+				pinctrl-single,register-width = <32>;
+				pinctrl-single,function-mask = <7>;
+
+				range: gpio-range {
+					#pinctrl-single,gpio-range-cells = <3>;
+				};
+			};
+
+			acipc: acipc@d401d000 {
+				compatible = "mrvl,mmp-acipc";
+				reg = <0xd401d000 0x100>;
+				interrupts = <0 16 0x4>,<0 17 0x4>,<0 18 0x4>;
+				interrupt-names = "IPC_AP_DATAACK", "IPC_AP_SET_CMD", "IPC_AP_SET_MSG";
+				status = "disabled";
+			};
+		};
+		soc-camera@0 {
+			compatible = "soc-camera-pdrv";
+			status = "disabled";
+			reg = <0x0 0x0>;
+		};
+		soc-camera@1 {
+			compatible = "soc-camera-pdrv";
+			status = "disabled";
+			reg = <0x1 0x0>;
+		};
+		sram: sram@0xd1004000 {
+			compatible = "mmio-sram";
+			reg = <0xd1004000 0xaa00>;
+		};
+		soc-isp {
+			compatible = "soc-isp";
+			interrupts = <0 11 0x4>;
+			status = "disabled";
+		};
+		ion {
+			compatible = "pxa-ion";
+			status = "disabled";
+		};
+		ramoops {
+			compatible = "ramoops";
+			status = "disabled";
+		};
+	};
+};

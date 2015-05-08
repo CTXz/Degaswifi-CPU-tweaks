@@ -1,0 +1,110 @@
+/*
+ *  Copyright (C) 2012 Marvell Technology Group Ltd.
+ *  Author: Haojian Zhuang <haojian.zhuang@marvell.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License version 2 as
+ *  publishhed by the Free Software Foundation.
+ */
+
+/dts-v1/;
+/memreserve/ 0x09000000 0x01000000;
+#include "eden.dtsi"
+
+/ {
+	model = "Marvell EDEN Concord Development Board";
+	compatible = "mrvl,eden-concord", "mrvl,eden";
+
+	chosen {
+		bootargs = "rdinit=/busybox/rdinit console=ttyS0,115200 uart_dma mem=512M";
+	};
+
+	memory {
+		reg = <0x00000000 0x20000000>;
+	};
+
+	gic: interrupt-controller@d1e02000 {
+		status = "okay";
+	};
+
+        generic-timer {
+		status = "okay";
+	};
+
+	board {
+		pll1_416_freq {
+			freq = <26000000>;
+		};
+		pll1_624_freq {
+			freq = <26000000>;
+		};
+	};
+
+	soc {
+		apb@d4000000 {
+			/* PDMA Controller 0 */
+			pdma0: pdma@d4000000 {
+				status = "okay";
+			};
+
+			/* PDMA Controller 1 */
+			pdma1: pdma@d4008000 {
+				status = "okay";
+			};
+
+			uart1: uart@d4030000 {
+				status = "okay";
+
+				uart0_clksrc {
+					clksrc = "vctcxo";
+				};
+			};
+
+			twsi1: i2c@d4011000 {
+				status = "okay";
+			};
+
+			rtc: rtc@d4010000 {
+				status = "okay";
+			};
+
+			gpio: gpio@d4019000 {
+				status = "okay";
+			};
+
+			pmx: pinmux@d401e000 {
+				status = "okay";
+				/* pin base, nr pins & gpio function */
+				pinctrl-single,gpio-range = <EDEN_GPIO_PINMUX>;
+			};
+
+		};
+	};
+
+	ion {
+		marvell,ion-nr = <2>;
+		status = "okay";
+		heap1 {
+			marvell,ion-name = "carveout_heap";
+			marvell,ion-type = <2>;
+			marvell,ion-id = <2>;
+			marvell,ion-base = <0x09000000>;
+			marvell,ion-size = <0x01000000>;
+		};
+		heap2 {
+			marvell,ion-name = "system_heap";
+			marvell,ion-type = <0>;
+			marvell,ion-id = <0>;
+		};
+	};
+
+	smc91x: smc91x@80000300 {
+		compatible = "smsc,lan91c111";
+		reg = <0x80000300 0xffcff>;
+		interrupts = <0 63 0x1>;
+		rst_gpio = <&gpio GPIO(3) 0>;
+		clksrc = "smc91x";
+		status = "okay";
+	};
+
+};

@@ -1,0 +1,523 @@
+/*
+ *  Copyright (C) 2012 Marvell Technology Group Ltd.
+ *  Author: Jing Xiang <jing.xiang@marvell.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License version 2 as
+ *  publishhed by the Free Software Foundation.
+ */
+
+/dts-v1/;
+/memreserve/ 0x09000000 0x04000000;	/* ION */
+/memreserve/ 0x17000000 0x017e8000;	/* default fb-mem (size: 1088*1920*4*3) */
+#include "eden.dtsi"
+#include "regulator.h"
+
+/ {
+	model = "Marvell EDEN Concord Development Board";
+	compatible = "mrvl,eden-concord", "mrvl,eden";
+
+	interrupt-parent = <&gic>;
+
+	memory {
+		device_type = "memory";
+		reg = <0 0 0x40000000>;
+	};
+
+	gic: interrupt-controller@d1e02000 {
+		status = "okay";
+	};
+
+	gpio_keys {
+			compatible = "gpio-keys";
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			volume-up {
+				label = "Volume Up";
+				linux,code = <115>; /* KEY_VOLUMEUP */
+				gpios = <&gpio GPIO(15) 1>;
+			};
+			volume-down {
+				label = "Volume Down";
+				linux,code = <114>;/* KEY_VOLUMEDOWN */
+				gpios = <&gpio GPIO(17) 1>;
+			};
+	};
+
+	gps: mmp-gps {
+		compatible = "marvell,mmp-gps";
+		vgps-supply = <&ldo18>;
+		on-off-gpio = <&gpio GPIO(53) 0>;
+		reset-n-gpio = <&gpio GPIO(122) 0>;
+	};
+
+	soc {
+		axi@d4200000 {	/* AXI */
+			dsi: dsi@d420b800 {
+				marvell,phy-name = "mmp_dsi1";
+				marvell,plat-path-name = "mmp_pnpath";
+				marvell,dsi-lanes = <4>;
+				marvell,burst-mode = <2>;
+				marvell,hbp-en;
+				dsi_avdd-supply = <&buck3>;
+				status = "okay";
+			};
+
+			vdma: vdma@d427f000 {
+				marvell,vdma-num = <4>;
+				status = "okay";
+				vdma1 {
+					marvell,vdma-id = <0>;
+					marvell,sram-size = <17408>;
+					marvell,is_vid = <0>;
+				};
+				vdma2 {
+					marvell,vdma-id = <1>;
+					marvell,sram-size = <17408>;
+					marvell,is_vid = <0>;
+				};
+				vdma3 {
+					marvell,vdma-id = <2>;
+					marvell,sram-size = <17408>;
+					marvell,is_vid = <1>;
+				};
+				vdma4 {
+					marvell,vdma-id = <3>;
+					marvell,sram-size = <17408>;
+					marvell,is_vid = <1>;
+				};
+			};
+
+			apical: apical@d420b400 {
+				marvell,apical-num = <1>;
+				status = "okay";
+			};
+
+			disp: disp@d420b000 {
+				marvell,disp-name = "mmp_disp";
+				marvell,path-num = <1>;
+				status = "okay";
+				path1 {
+					marvell,path-name = "mmp_pnpath";
+					marvell,overlay-num = <2>;
+					marvell,overlay-table = <0>, <1>;
+					marvell,output-type = <1>;
+					marvell,path-config = <0x10>;
+					marvell,link-config = <1>;
+					pn_sclk_clksrc {
+						clksrc = "disp1";
+					};
+					disp1_clksrc {
+						clksrc = "pll1_416";
+					};
+					disp_apmu_ver {
+						version = "ax";
+					};
+				};
+			};
+
+			fb: fb {
+				marvell,fb-name = "mmp_fb";
+				marvell,path-name = "mmp_pnpath";
+				marvell,overlay-id = <1>;
+				marvell,default-pixfmt = <0x108>;
+				marvell,buffer-num = <3>;
+				marvell,fb-mem = <0x17000000>;
+				status = "okay";
+			};
+
+			fb1: fb-overlay {
+				marvell,fb-name = "mmp_fb_overlay";
+				marvell,path-name = "mmp_pnpath";
+				marvell,overlay-id = <0>;
+				status = "okay";
+			};
+
+			adma0: adma@c0ffd800 {
+				status = "okay";
+			};
+			adma1: adma@c0ffd900 {
+				status = "okay";
+			};
+		};
+
+		apb@d4000000 {
+			/* PDMA Controller 0 */
+			pdma0: pdma@d4000000 {
+				status = "okay";
+			};
+
+			/* PDMA Controller 1 */
+			pdma1: pdma@d4008000 {
+				status = "okay";
+			};
+
+			/* UART for GPS */
+			uart1: uart@d4030000 {
+				pinctrl-names = "default"; pinctrl-0 = <&uart1_pins>;
+				status = "okay";
+			};
+
+			/* UART for AP */
+			uart3: uart@d4018000 {
+				pinctrl-names = "default"; pinctrl-0 = <&uart3_pins>;
+				status = "okay";
+			};
+
+			/* UART for WIFI and SPI NOR */
+			uart4: uart@d4016000 {
+				pinctrl-names = "default"; pinctrl-0 = <&uart4_pins>;
+				status = "okay";
+			};
+
+			pwm2: pwm@d401a400 {
+				pinctrl-names = "default"; pinctrl-0 = <&pwm2_pins>;
+				status = "okay";
+			};
+
+			gpio: gpio@d4019000 {
+				status = "okay";
+			};
+
+			twsi1: i2c@d4011000 {
+				pinctrl-names = "default", "idle";
+				pinctrl-0 = <&twsi1_pins>;
+				pinctrl-1 = <&twsi1_cp_pins>;
+				mrvl,i2c-apdcp;
+				status = "okay";
+				pmic1: 88pm860@30 {
+					compatible = "marvell,88pm800";
+					reg = <0x30>;
+					interrupts = <0 77 0x4>;
+					interrupt-parent = <&gic>;
+					interrupt-controller;
+					#interrupt-cells = <1>;
+					marvell,88pm800-power-page-addr = <0x31>;
+					marvell,88pm800-gpadc-page-addr = <0x32>;
+
+					regulators {
+						compatible = "marvell,88pm80x-regulator";
+
+						buck1a: BUCK1A {PM800_BUCK1A;regulator-boot-on;regulator-always-on;};
+						buck2: BUCK2 {PM800_BUCK2;};
+						buck3: BUCK3 {PM800_BUCK3;regulator-boot-on;regulator-always-on;};
+						buck4: BUCK4 {PM800_BUCK4;};
+						buck5: BUCK5 {PM800_BUCK5;regulator-boot-on;regulator-always-on;};
+						buck6: BUCK6 {PM800_BUCK6;};
+						buck1b: BUCK1B {PM800_BUCK1B;regulator-boot-on;regulator-always-on;};
+						ldo1: LDO1 {PM800_LDO1;regulator-boot-on;regulator-always-on;};
+						ldo2: LDO2 {PM800_LDO2;regulator-boot-on;regulator-always-on;};
+						ldo3: LDO3 {PM800_LDO3;};
+						ldo4: LDO4 {PM800_LDO4;};
+						ldo5: LDO5 {PM800_LDO5;};
+						ldo6: LDO6 {PM800_LDO6;};
+						ldo7: LDO7 {PM800_LDO7;};
+						ldo8: LDO8 {PM800_LDO8;regulator-boot-on;regulator-always-on;};
+						ldo9: LDO9 {PM800_LDO9;};
+						ldo10: LDO10 {PM800_LDO10;};
+						ldo11: LDO11 {PM800_LDO11;regulator-boot-on;regulator-always-on;};
+						ldo12: LDO12 {PM800_LDO12;regulator-boot-on;regulator-always-on;};
+						ldo13: LDO13 {PM800_LDO13;};
+						ldo14: LDO14 {PM800_LDO14;};
+						ldo15: LDO15 {PM800_LDO15;};
+						ldo16: LDO16 {PM800_LDO16;regulator-boot-on;regulator-always-on;};
+						ldo17: LDO17 {PM800_LDO17;};
+						ldo18: LDO18 {PM800_LDO18;};
+						ldo19: LDO19 {PM800_LDO19;regulator-boot-on;};
+						ldo20: LDO20 {PM800_LDO20;};
+					};
+				};
+				codec1: 88pm860@38 {
+					compatible = "marvell,88pm860";
+					reg = <0x38>;
+				};
+			};
+
+			twsi2: i2c@d4031000 {
+				pinctrl-names = "default"; pinctrl-0 = <&twsi2_pins>;
+				status = "okay";
+
+				pressuresensor: lps331ap@5d {
+					compatible = "st,lps331ap";
+					reg = <0x5d>;
+					lps331ap,poll_interval = <1000>;
+				};
+
+				motionsensor: mpu9250@69 {
+					pinctrl-names = "default"; pinctrl-0 = <&motion_sensor_pins>;
+					compatible = "invensense,mpu9250";
+					reg = <0x69>;
+					interrupt-parent = <&gpio>;
+					interrupts = <GPIO(11) 0x2>;
+					invensense,irq-gpios = <&gpio GPIO(11) 0x00>;
+					avdd-supply = <&ldo4>;
+				};
+			};
+
+			twsi3: i2c@d4032000 {
+				pinctrl-names = "default"; pinctrl-0 = <&twsi3_pins>;
+				status = "okay";
+			};
+
+			twsi4: i2c@d4033000 {
+				pinctrl-names = "default"; pinctrl-0 = <&twsi4_pins>;
+				status = "okay";
+
+				lightsensor: apds990x@39 {
+					pinctrl-names = "default"; pinctrl-0 = <&apds990x_pins>;
+					compatible = "avgo,apds990x";
+					reg = <0x39>;
+					interrupt-parent = <&gpio>;
+					interrupts = <GPIO(132) 0x1>;
+				};
+			};
+
+			twsi5: i2c@d4033800 {
+				pinctrl-names = "default"; pinctrl-0 = <&twsi5_pins>;
+				status = "okay";
+
+				backlight1: lm3532@38 {
+					compatible = "bl,lm3532";
+					reg = <0x38>;
+					flags = <0>;
+					ramp_time = <0>;
+					ctrl_a_fs_current = <0x1b>;
+					ctrl_a_mapping_mode = <0x2>;
+					ctrl_a_pwm = <0x86>;
+					rst_gpio = <&gpio GPIO(6) 0>;
+					avdd-supply = <&ldo12>;
+				};
+
+				backlight2: pm828x@10 {
+					compatible = "bl,88pm828x";
+					reg = <0x10>;
+					ramp_mode = <0x2>;
+					idac_current = <0xa00>;
+					ramp_clk = <0>;
+					str_config = <0x1>;
+					avdd-supply = <&ldo12>;
+				};
+
+				touch1: gt913@5d {
+					compatible = "goodix,gt913-touch";
+					pinctrl-names = "default"; pinctrl-0 = <&touch_pins>;
+					reg = <0x5d>;
+					interrupt-parent = <&gpio>;
+					interrupts = <GPIO(52) 0x1>;
+					irq-gpios = <&gpio GPIO(52) 0>;
+					reset-gpios = <&gpio GPIO(2) 0>;
+					goodix,max-height = <1280>;
+					goodix,max-width = <720>;
+					avdd-supply = <&ldo12>;
+				};
+
+				touch2: s3202@20 {
+					compatible = "synaptics,s3202-touch";
+					pinctrl-names = "default"; pinctrl-0 = <&touch_pins>;
+					reg = <0x20>;
+					interrupt-parent = <&gpio>;
+					interrupts = <GPIO(52) 0x1>;
+					/* IRQF_ONESHOT | IRQF_TRIGGER_FALLING */
+					synaptics,irq-flags =  <0x2002>;
+					synaptics,irq-gpios = <&gpio GPIO(52) 0>;
+					synaptics,reset-gpios = <&gpio GPIO(2) 0>;
+					synaptics,sensor_res_x = <720>;
+					synaptics,sensor_res_y = <1280>;
+					synaptics,sensor_max_x = <798>;
+					synaptics,sensor_max_y = <1392>;
+					synaptics,sensor_margin_x = <39>;
+					synaptics,sensor_margin_y = <0>;
+					avdd-supply = <&ldo12>;
+				};
+
+				touch3: s3202@22 {
+					compatible = "synaptics,s3202-touch";
+					pinctrl-names = "default"; pinctrl-0 = <&touch_pins>;
+					reg = <0x22>;
+					interrupt-parent = <&gpio>;
+					interrupts = <GPIO(52) 0x1>;
+					/* IRQF_ONESHOT | IRQF_TRIGGER_FALLING */
+					synaptics,irq-flags =  <0x2002>;
+					synaptics,irq-gpios = <&gpio GPIO(52) 0>;
+					synaptics,reset-gpios = <&gpio GPIO(2) 0>;
+					synaptics,sensor_res_x = <1080>;
+					synaptics,sensor_res_y = <1920>;
+					synaptics,sensor_max_x = <1080>;
+					synaptics,sensor_max_y = <2070>;
+					synaptics,sensor_margin_x = <0>;
+					synaptics,sensor_margin_y = <0>;
+					avdd-supply = <&ldo12>;
+				};
+			};
+
+			twsi6: i2c@d4034000 {
+				pinctrl-names = "default"; pinctrl-0 = <&twsi6_pins>;
+				status = "okay";
+			};
+
+			thermal: thermal@d403b000 {
+				status = "okay";
+			};
+
+			rtc: rtc@d4010000 {
+				status = "okay";
+			};
+
+			/* SSPA port 0 */
+			sspa0: sspa@c0ffdc00 {
+				playback_period_bytes = <4096>;
+				playback_buffer_bytes = <12288>;
+				capture_period_bytes = <4096>;
+				capture_buffer_bytes = <12288>;
+				status = "okay";
+			};
+
+			/* SSPA port 1 */
+			sspa1: sspa@c0ffdd00 {
+				playback_period_bytes = <4096>;
+				playback_buffer_bytes = <12288>;
+				capture_period_bytes = <4096>;
+				capture_buffer_bytes = <12288>;
+				status = "okay";
+			};
+
+			map: map@c3000000 {
+				status = "okay";
+			};
+
+			pmx: pinmux@d401e000 {
+				status = "okay";
+				/* pin base, nr pins & gpio function */
+				pinctrl-single,gpio-range = <EDEN_GPIO_PINMUX>;
+
+				uart1_pins: pinmux_uart1_pins {
+					pinctrl-single,pins = <P00_UART1_RXD  P01_UART1_TXD>;
+					MFP_DEFAULT;
+				};
+
+				uart3_pins: pinmux_uart3_pins {
+					pinctrl-single,pins = <P33_UART3_RXD P34_UART3_TXD>;
+					MFP_DEFAULT;
+				};
+
+				uart4_pins: pinmux_uart4_pins {
+					pinctrl-single,pins = <P48_UART4_RXD P47_UART4_TXD
+								P50_UART4_RTS P49_UART4_CTS>;
+					MFP_DEFAULT;
+				};
+
+				pwm2_pins: pinmux_pwm2_pins {
+					pinctrl-single,pins = <P51_PWM2>;
+					MFP_DEFAULT;
+				};
+
+				twsi1_pins: pinmux_twsi1_pins {
+					pinctrl-single,pins = <P67_PWR_SCL P68_PWR_SDA>;
+					MFP_DEFAULT;
+				};
+
+				twsi1_cp_pins: pinmux_twsi1_cp_pins {
+					pinctrl-single,pins = <P67_PWR_CP_SCL P68_PWR_CP_SDA>;
+					MFP_DEFAULT;
+				};
+
+				twsi2_pins: pinmux_twsi2_pins {
+					pinctrl-single,pins = <P43_TWSI2_SCL P44_TWSI2_SDA>;
+					MFP_DEFAULT;
+				};
+
+				twsi3_pins: pinmux_twsi3_pins {
+					pinctrl-single,pins = <P18_TWSI3_SCL P19_TWSI3_SDA>;
+					MFP_DEFAULT;
+				};
+
+				twsi4_pins: pinmux_twsi4_pins {
+					pinctrl-single,pins = <P46_TWSI4_SCL P45_TWSI4_SDA>;
+					MFP_DEFAULT;
+				};
+
+				twsi5_pins: pinmux_twsi5_pins {
+					pinctrl-single,pins = <P29_TWSI5_SCL P30_TWSI5_SDA>;
+					MFP_DEFAULT;
+				};
+
+				twsi6_pins: pinmux_twsi6_pins {
+					pinctrl-single,pins = <P35_TWSI6_SCL P36_TWSI6_SDA>;
+					MFP_DEFAULT;
+				};
+
+				touch_pins: pinmux_touch_pins {
+					pinctrl-single,pins = <P52_GPIO P02_GPIO>;
+					MFP_DEFAULT;
+				};
+
+				apds990x_pins: pinmux_apds990x_pins {
+					pinctrl-single,pins = <P132_GPIO>;
+					MFP_DEFAULT;
+				};
+
+				motion_sensor_pins: pinmux_motion_sensor_pins {
+					pinctrl-single,pins = <P11_GPIO>;
+					MFP_PULL_LOW;
+				};
+			};
+		};
+	};
+
+	sound {
+		compatible = "marvell,mmp-map-snd-card";
+		sspa-controllers = <&sspa0 &sspa1>;
+	};
+
+	ion {
+		marvell,ion-nr = <2>;
+		status = "okay";
+		heap1 {
+			marvell,ion-name = "carveout_heap";
+			marvell,ion-type = <2>;
+			marvell,ion-id = <2>;
+			marvell,ion-base = <0x09000000>;
+			marvell,ion-size = <0x04000000>;
+		};
+		heap2 {
+			marvell,ion-name = "system_heap";
+			marvell,ion-type = <0>;
+			marvell,ion-id = <0>;
+		};
+	};
+
+	backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm2 0 100000>;
+
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
+	};
+
+	panel: r63311 {
+		compatible = "marvell,mmp-r63311";
+		marvell,path-name = "mmp_pnpath";
+		rst_gpio = <&gpio GPIO(121) 0>;
+		power_gpio = <&gpio GPIO(10) 0>;
+		iovdd-supply = <&buck2>;
+		status = "okay";
+	};
+
+	panel2: lg4591 {
+		compatible = "marvell,mmp-lg4591";
+		marvell,path-name = "mmp_pnpath";
+		rst_gpio = <&gpio GPIO(121) 0>;
+		iovdd-supply = <&buck2>;
+		avdd-supply = <&ldo12>;
+		status = "okay";
+	};
+
+	panel3: otm1281 {
+		compatible = "marvell,mmp-otm1281";
+		marvell,path-name = "mmp_pnpath";
+		rst_gpio = <&gpio GPIO(121) 0>;
+		iovdd-supply = <&buck2>;
+		status = "okay";
+	};
+};

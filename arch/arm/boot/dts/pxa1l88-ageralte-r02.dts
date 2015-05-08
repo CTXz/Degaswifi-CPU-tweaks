@@ -1,0 +1,1503 @@
+/* arch/arm/boot/dts/pxall88-ageralte-r02.dts
+ * Copyright (C) 2014 Samsung Electronics Co, Ltd.
+ *
+ * Based on arch/arm/boot/dts/pxa1l88-moutailte-r01.dts
+ * Author: Shankar Bandal <shankar.b@samsung.com>
+ *
+ * This software is licensed under the terms of the GNU General Public
+ * License version 2, as published by the Free Software Foundation,
+ * and may be copied, distributed, and modified under those terms.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/mmc/pxa_sdhci.h>
+#include <dt-bindings/linux/sizes.h>
+#include <dt-bindings/video/mmp_disp.h>
+
+#include "sec-machtypes.h"
+#include "sec-pxa1x88-pinfunc.h"
+#include "pxa1088.dtsi"
+
+/ {
+	model = "Samsung Ageralte board based on PXA1L88";
+	compatible = "mrvl,pxa1L88-sec", "mrvl,pxa1L88";
+	pxa,rev-id = <MACH_TYPE_AGERALTE 2>;
+
+	aliases {
+		i2c5 = &sensori2c;
+		i2c7 = &connectori2c;
+	};
+
+	memory {
+		/* Memory Banks
+		 * Bank 1 : Base 0x00000000
+		 *	    Size 512 MB
+		 * Bank 2 : Base 0x20000000
+		 *	    Size 256 MB
+		 */
+		reg = <0x00000000 0x20000000 0x20000000 0x10000000>;
+	};
+
+	reserved_memory {
+
+		obm {
+			compatible = "marvell,obm-heap";
+			obm-base-default = <0x00000000>;
+			obm-base-with-tz = <0x01000000>;
+			obm-base-with-crash-dump = <0x06000000>;
+			obm-size = <(SZ_1M)>;
+			status = "okay";
+		};
+
+		cp {
+			compatible = "marvell,cp-heap";
+			cp-base = <0x05000000>;
+			cp-size = <(48 * SZ_1M)>;
+			status = "okay";
+		};
+
+		/* ramoops buffer (256KB) */
+		ramoops {
+			compatible = "marvell,ramoops-heap";
+			ramoops-base = <0x08100000>;
+			ramoops-size = <(256 * SZ_1K)>;
+			status = "okay";
+		};
+
+		gpu {
+			compatible = "marvell,gpu-heap";
+			gpu-size = <(32 * SZ_1M)>;
+			status = "okay";
+		};
+
+		ion {
+			compatible = "marvell,ion-heap";
+			ion-base = <0x09000000>;
+			ion-size = <(16 * SZ_1M)>;
+			status = "okay";
+		};
+
+		cma {
+			compatible = "linux,cma-heap";
+			size = <(80 * SZ_1M)>;
+			status = "okay";
+		};
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&volumekeys_gpio_pmx &homekey_gpio_pmx>;
+		pinctrl-1 = <&gpio_keypad_func1>;
+		status = "okay";
+
+		volume-up {
+			label = "volup_key";
+			gpios = <&gpio 16 GPIO_ACTIVE_LOW>;
+			linux,code = <115>;	/* KEY_VOLUMEUP */
+			debounce-interval = <30>;
+		};
+
+		volume-down {
+			label = "voldown_key";
+			gpios = <&gpio 17 GPIO_ACTIVE_LOW>;
+			linux,code = <114>;	/* KEY_VOLUMEUP */
+			debounce-interval = <30>;
+		};
+
+		home-key {
+			label = "home_key";
+			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
+			linux,code = <102>;	/* KEY_HOME */
+			debounce-interval = <30>;
+			gpio-key,wakeup;
+		};
+	};
+
+	soc {
+		ddr@c0100000 {  /* DDR memory controller */
+			status = "okay";
+		};
+
+		axi@d4200000 {	/* AXI */
+			coda7542: coda7542@d420d000 {
+				marvell,sram-internal = <1>;
+				marvell,nv21_support = <1>;
+				status = "okay";
+			};
+			ccic1: ccic@d420a000 {
+				cam_core-supply = <&buck5>;
+				cam_avdd = <&gpio 72 0>;
+				cam_io = <&gpio 73 0>;
+				cam_af = <&gpio 19 0>;
+				cam_stby = <&gpio 14 0>;
+				cam_rst = <&gpio 15 0>;
+			       pinctrl-names = "default","enable";
+				pinctrl-0 = <&cam_pmx_func1 &cam_pmx_func2 &cam_pmx_gpio>;
+				pinctrl-1 = <&cam_pmx_func1 &cam_pmx_func2 &cam_pmx_func3>;
+			       mclk-gpio = <&gpio 77 0>;
+				status = "okay";
+			};
+			usbphy: usbphy@d4207000 {
+				status = "okay";
+			};
+
+			udc: udc@d4208100 {
+				status = "okay";
+			};
+
+			dsi: dsi@d420b800 {
+				marvell,phy-name = "mmp_dsi1";
+				marvell,plat-path-name = "mmp_pnpath";
+				marvell,dsi-lanes = <2>;
+				marvell,burst-mode = <2>;
+				marvell,master-mode;
+				marvell,hbp-en;
+				marvell,hfp-en;
+				status = "okay";
+			};
+
+			disp: disp@d420b000 {
+				marvell,disp-name = "disp_name";
+				marvell,path-num = <1>;
+				status = "okay";
+				path1 {
+					marvell,path-name = "mmp_pnpath";
+					marvell,overlay-num = <1>;
+					marvell,overlay-table = <PN_GRA>;
+					marvell,output-type = <PATH_OUT_DSI>;
+					marvell,path-config = <0x10>;
+					marvell,link-config = <0x1>;
+					WVGA {
+						disp1_clksrc = "pll1_416m";
+						dsipll_clksrc = "pll3";
+						pn_sclk_clksrc = "disp1";
+					};
+
+				};
+			};
+
+			fb0: fbbase {
+				marvell,fb-name = "mmp-fb";
+				marvell,path-name = "mmp_pnpath";
+				marvell,overlay-id = <PN_GRA>;
+				marvell,default-pixfmt = <PIXFMT_RGBA888>;
+				marvell,buffer-num = <3>;
+				marvell,fb-mem = <0xb000000>;
+				status = "okay";
+			};
+
+			/* eMMC */
+			sdh3: sdh@d4281000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&sdh3_pmx_func1 &sdh3_pmx_func2>;
+				bus-width = <8>;
+				non-removable;
+				marvell,sdh-pm-runtime-en;
+				marvell,sdh-quirks = <(
+						SDHCI_QUIRK_BROKEN_ADMA |
+						SDHCI_QUIRK_BROKEN_CARD_DETECTION
+						)>;
+				marvell,sdh-quirks2 = <(SDHCI_QUIRK2_BUS_CLK_GATE_ENABLED)>;
+				marvell,sdh-host-caps = <(MMC_CAP_1_8V_DDR)>;
+				marvell,sdh-flags = <(
+						PXA_FLAG_SD_8_BIT_CAPABLE_SLOT |
+						PXA_FLAG_ENABLE_CLOCK_GATING |
+						PXA_FLAG_TX_SEL_BUS_CLK
+					      )>;
+				/* prop "sdh-dtr-data": <timing preset_rate src_rate tx_delay rx_delay> */
+				marvell,sdh-dtr-data = <PXA_MMC_TIMING_LEGACY PXA_SDH_DTR_26M PXA_SDH_DTR_104M 0 0>,
+						<PXA_MMC_TIMING_MMC_HS PXA_SDH_DTR_52M PXA_SDH_DTR_104M 0 0>,
+						<PXA_MMC_TIMING_UHS_DDR50 PXA_SDH_DTR_52M PXA_SDH_DTR_104M 0 0>,
+						<PXA_MMC_TIMING_MAX PXA_SDH_DTR_PS_NONE PXA_SDH_DTR_104M 0 0>;
+				status = "okay";
+			};
+
+			/* SD card */
+			sdh1: sdh@d4280000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&sdh1_pmx_func1 &sdh1_pmx_func2 &sdh1_pmx_func3 &sdh1_pmx_func4 &sdh1_pmx_func5 &sdh1_pmx_func6>;
+				vqmmc-supply	= <&ldo5>;
+				vmmc-supply	= <&ldo4>;
+				cd-gpios = <&gpio 90 0>;
+				cd-inverted;
+				bus-width = <4>;
+				wp-inverted;
+				marvell,sdh-pm-runtime-en;
+				marvell,sdh-quirks = <(
+						SDHCI_QUIRK_INVERTED_WRITE_PROTECT |
+						SDHCI_QUIRK_BROKEN_CARD_DETECTION
+						)>;
+				marvell,sdh-quirks2 = <(SDHCI_QUIRK2_BUS_CLK_GATE_ENABLED)>;
+				marvell,sdh-host-caps2 = <(MMC_CAP2_DETECT_ON_ERR)>;
+				marvell,sdh-flags = <(
+						PXA_FLAG_TX_SEL_BUS_CLK |
+						PXA_FLAG_ENABLE_CLOCK_GATING
+					      )>;
+				/* prop "sdh-dtr-data": <timing preset_rate src_rate tx_delay rx_delay> */
+				marvell,sdh-dtr-data = <PXA_MMC_TIMING_LEGACY PXA_SDH_DTR_26M PXA_SDH_DTR_104M 0 0>,
+						<PXA_MMC_TIMING_SD_HS PXA_SDH_DTR_52M PXA_SDH_DTR_104M 0 0>,
+						<PXA_MMC_TIMING_UHS_DDR50 PXA_SDH_DTR_52M PXA_SDH_DTR_104M 0 0>,
+						<PXA_MMC_TIMING_MAX PXA_SDH_DTR_PS_NONE PXA_SDH_DTR_104M 0 0>;
+				status = "okay";
+			};
+
+			/* SDIO */
+			sdh2: sdh@d4280800 {
+				pinctrl-names = "default", "fast", "sleep";
+				pinctrl-0 = <&sdh2_pmx_func1 &sdh2_pmx_func3 &sdh2_pmx_func5>;
+				pinctrl-1 = <&sdh2_pmx_func1_fast &sdh2_pmx_func2_fast &sdh2_pmx_func3 &sdh2_pmx_func5>;
+				pinctrl-2 = <&sdh2_pmx_edge_wakeup>;
+				bus-width = <4>;
+				mrvl,clk-delay-cycles = <0x0>;
+				marvell,sdh-quirks = <(
+						SDHCI_QUIRK_BROKEN_CARD_DETECTION
+						)>;
+				marvell,sdh-quirks2 = <(
+				        SDHCI_QUIRK2_BUS_CLK_GATE_ENABLED |
+				        SDHCI_QUIRK2_SDIO_SW_CLK_GATE |
+				        SDHCI_QUIRK2_HOLDSUSPEND_AFTER_REQUEST
+				        )>;
+				marvell,sdh-host-caps2 = <(MMC_CAP2_NO_VOLTAGE_SWITCH)>;
+				marvell,sdh-flags = <(
+						PXA_FLAG_WAKEUP_HOST |
+						PXA_FLAG_ENABLE_CLOCK_GATING |
+						PXA_FLAG_TX_SEL_BUS_CLK |
+						PXA_FLAG_EN_PM_RUNTIME |
+						PXA_FLAG_DISABLE_PROBE_CDSCAN
+					    )>;
+				marvell,sdh-pm-caps = <(
+			            MMC_PM_KEEP_POWER
+			            )>;
+				/* prop "sdh-dtr-data": <timing preset_rate src_rate tx_delay rx_delay> */
+				marvell,sdh-dtr-data = <PXA_MMC_TIMING_LEGACY PXA_SDH_DTR_26M PXA_SDH_DTR_104M 0 0>,
+						<PXA_MMC_TIMING_SD_HS PXA_SDH_DTR_45M PXA_SDH_DTR_89M 0 0>,
+						<PXA_MMC_TIMING_UHS_SDR104 PXA_SDH_DTR_208M PXA_SDH_DTR_208M 0 0>,
+						<PXA_MMC_TIMING_MAX PXA_SDH_DTR_PS_NONE PXA_SDH_DTR_89M 0 0>;
+				status = "okay";
+			};
+
+			squ: squ@d42a0800 {
+				compatible = "marvell,pxa910-squ";
+				reg = <0xd42a0800 0x100>;
+				interrupts = <0 46 0x4>;
+				#dma-cells = <1>;
+				asram = <&sram>;
+			};
+
+			vpu-devfreq {
+				status = "okay";
+			};
+			geu: geu {
+				status = "okay";
+			};
+		};
+
+		apb@d4000000 {
+			pdma0: pdma@d4000000 {
+				status = "okay";
+			};
+
+			uart2: uart@d4017000 {
+				pinctrl-names = "default", "sleep";
+				pinctrl-0 = <&uart2_pmx_func1 &uart2_pmx_func2>;
+				pinctrl-1 = <&uart2_pmx_func1_sleep &uart2_pmx_func2>;
+				edge-wakeup-gpio = <47>; /* GPIO47: UART rx pin */
+				status = "okay";
+			};
+
+			uart3: uart@d4018000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&uart3_pmx_func>;
+				status = "okay";
+			};
+
+			mfpr: mfpr@d401e000 {
+				pinctrl-names = "default";
+				reg = <0xd401e000 0x280>;
+				// pinctrl-0 = <&mfp_pins_group_0 &mfp_pins_group_1 &mfp_pins_group_2 &mfp_pins_group_3 &mfp_pins_group_4 &mfp_pins_group_5 &mfp_pins_group_6 &mfp_pins_group_7>;
+				pinctrl-0 = <&mfp_pins_group_0>;
+				status = "ok";
+			};
+
+			edgewakeup: edgewakeup@d4019800 {
+				status = "ok";
+			};
+
+			rtc: rtc@d4010000 {
+				status = "okay";
+			};
+
+			thermal: thermal@d4013200 {
+				compatible = "marvell,pxa-thermal";
+				reg = <0xd4013200 0x50>;
+				interrupts = <0 60 0x4>;
+				trigger_levels_count = <4>;
+				type = <2>;
+				status = "ok";
+			};
+
+			watchdog: watchdog@d4080000 {
+				status = "okay";
+			};
+
+			ssp_dai1: pxa-ssp-dai@1 {
+				compatible = "mrvl,pxa-ssp-dai";
+				reg = <0x1 0x0>;
+				port = <&ssp1>;
+				pinctrl-names = "default","ssp";
+				pinctrl-0 = <&i2s_gpio>;
+				pinctrl-1 = <&i2s_func>;
+				ssp-gpio = <&gpio 21 0 &gpio 22 0 &gpio 23 0 &gpio 24 0>;
+				dmas = <&squ 1
+					&squ 0>;
+				dma-names = "rx", "tx";
+				asram = <&sram>;
+				platform_driver_name = "tdma_platform";
+				burst_size = <4>;
+				playback_period_bytes = <4096>;
+				playback_buffer_bytes = <20480>;
+				capture_period_bytes = <4096>;
+				capture_buffer_bytes = <20480>;
+			};
+
+			ssp_dai4: pxa-ssp-dai@4 {
+				compatible = "mrvl,pxa-ssp-dai";
+				reg = <0x4 0x0>;
+				port = <&ssp4>;
+				pinctrl-names = "default","ssp";
+				pinctrl-0 = <&gssp_gpio>;
+				pinctrl-1 = <&gssp_func>;
+				ssp-gpio = <&gpio 25 0 &gpio 26 0 &gpio 27 0 &gpio 28 0>;
+				dmas = <&pdma0 6 0
+					&pdma0 7 0>;
+				dma-names = "rx", "tx";
+				platform_driver_name = "pdma_platform";
+				burst_size = <8>;
+				playback_period_bytes = <4096>;
+				playback_buffer_bytes = <131072>;
+				capture_period_bytes = <4096>;
+				capture_buffer_bytes = <131072>;
+			};
+
+			gpio: gpio@d4019000 {
+				status = "okay";
+				/*
+				 * In theorical, some gpios could be routed to
+				 * multiple pins. So define the gpio-ranges in
+				 * board file, not silicon file.
+				 */
+				gcb0: gpio@d4019000 {
+					/* gpio offset, pin offset, nr pins */
+					gpio-ranges = <&pmx 0 55 32>;
+				};
+				gcb1: gpio@d4019004 {
+					gpio-ranges = <&pmx 0 87 23>;
+				};
+				gcb2: gpio@d4019008 {
+					gpio-ranges = <&pmx 3 110 29>;
+				};
+				gcb3: gpio@d4019100 {
+					gpio-ranges = <&pmx 0 139 3  &pmx 28 52 1>;
+				};
+			};
+
+			pmx: pinmux@d401e000 {
+				/* pin base, nr pins & gpio function */
+				pinctrl-single,gpio-range = <
+					/*
+					 * GPIO number is hardcoded for range at here.
+					 * In gpio chip, GPIO number is not hardcoded for range.
+					 * Since one gpio pin may be routed to multiple pins,
+					 * define these gpio range in pxa910-dkb.dts not pxa910.dtsi.
+					 */
+					&range 55 55 0	/* GPIO0 ~ GPIO54 */
+					&range 110 32 0 /* GPIO67 ~ GPIO98 */
+					&range 52 1 0	/* GPIO124 */
+				>;
+				cam_pmx_func1: cam_pmx_func1 {
+					pinctrl-single,pins = <
+						GPIO14 AF0
+						GPIO15 AF0
+					>;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_DRIVE_LOW;
+				};
+				cam_pmx_func2: cam_pmx_func2 {
+					pinctrl-single,pins = <
+						GPIO19 AF0
+						GPIO72 AF0
+						GPIO73 AF0
+					>;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_DRIVE_LOW;
+				};
+				cam_pmx_func3: cam_pmx_func3 {
+					pinctrl-single,pins = <
+						GPIO77 AF1
+					>;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_DRIVE_LOW;
+				};
+
+				cam_pmx_gpio: cam_pmx_gpio {
+                                       pinctrl-single,pins = <
+						GPIO77 AF0
+                                       >;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_DRIVE_LOW;
+				};
+
+				hw_rev_mod_2_pmx: hw_rev_mod_2_pmx {
+					pinctrl-single,pins = <
+						GPIO32 AF0
+					>;
+					MFP_PULL_FLOAT;
+				};
+
+				hw_rev_mod_2: hw_rev_mod_2 {
+					pinctrl-names = "default";
+					pinctrl-0 = <&hw_rev_mod_2_pmx>;
+				};
+				/* MFP_LPM_FLOAT */
+				mfp_pins_group_0: mfp_pins_group_0 {
+					pinctrl-single,pins = <
+						DF_IO8 AF1
+						DF_IO9 AF1
+						DF_IO10 AF1
+						DF_IO11 AF1
+						DF_IO12 AF1
+						DF_IO13 AF1
+						DF_IO14 AF1
+						DF_IO15 AF1
+						DF_WEn AF0
+						DF_REn AF0
+						DF_ALE_SM_WEn AF0
+						DF_RDY0 AF1
+						DF_RDY1 AF0
+						DF_nCS0_SM_nCS2 AF1
+						DF_nCS1_SM_nCS3 AF1
+						SM_nCS1 AF1
+						SM_nCS0 AF1
+						GPIO20 AF0
+						GPIO93 AF0
+						GPIO95 AF0
+						GPIO97 AF0
+					>;
+					PULL_UP;LPM_FLOAT;
+				};
+
+				/* MFP_PULL_LOW && MFP_LPM_PULL_FLOAT */
+				mfp_pins_group_1: mfp_pins_group_1 {
+					pinctrl-single,pins = <
+						GPIO15 AF0
+						GPIO72 AF0
+					>;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_FLOAT;
+				};
+
+				/* MFP_PULL_LOW && LPM_OUTPUT_DRIVE_LOW */
+				mfp_pins_group_2: mfp_pins_group_2 {
+					pinctrl-single,pins = <
+						GPIO18 AF0
+					>;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_DRIVE_LOW;
+				};
+
+				/* MFP_PULL_LOW */
+				mfp_pins_group_3: mfp_pins_group_3 {
+					pinctrl-single,pins = <
+						GPIO70 AF0
+						GPIO36 AF0
+						GPIO43 AF0
+						GPIO44 AF0
+						GPIO49 AF0
+						GPIO50 AF0
+						GPIO90 AF0
+						GPIO92 AF0
+						GPIO98 AF0
+					>;
+					MFP_PULL_DOWN;
+				};
+
+				/* MFP_PULL_HIGH */
+				mfp_pins_group_4: mfp_pins_group_4 {
+					pinctrl-single,pins = <
+						SM_RDY_GPIO_3 AF1
+						GPIO14 AF0
+						GPIO91 AF0
+					>;
+					MFP_PULL_UP;
+				};
+
+				/* MFP_PULL_FLOAT */
+				mfp_pins_group_5: mfp_pins_group_5 {
+					pinctrl-single,pins = <
+						GPIO4 AF0
+						GPIO96 AF0
+						GPIO67 AF0
+						GPIO68 AF0
+						GPIO69 AF0
+						GPIO80 AF0
+					>;
+					MFP_PULL_FLOAT;
+				};
+
+				/* MFP_PULL_FLOAT && MFP_LPM_PULL_FLOAT */
+				mfp_pins_group_6: mfp_pins_group_6 {
+					pinctrl-single,pins = <
+						GPIO32 AF0
+						SM_ADVMUX AF1
+						/* LED_R_CTRL */
+						SM_BE1 AF0
+						/* LED_G_CTRL */
+						GPIO12 AF0
+					>;
+					DS_MEDIUM;PULL_FLOAT;EDGE_NONE;LPM_FLOAT;
+				};
+
+				/* MFP_DEFAULT */
+				mfp_pins_group_7: mfp_pins_group_7 {
+					pinctrl-single,pins = <
+						GPIO124 AF0
+						GPIO3 AF0
+						GPIO5 AF0
+						GPIO6 AF0
+						GPIO11 AF0
+						GPIO13 AF0
+						GPIO19 AF0
+						GPIO10 AF0
+						GPIO29 AF0
+						GPIO30 AF0
+						GPIO31 AF0
+						GPIO33 AF0
+						GPIO34 AF0
+						GPIO35 AF0
+						GPIO51 AF1
+						GPIO52 AF1
+						GPIO73 AF0
+						GPIO74 AF0
+						GPIO76 AF0
+						GPIO78 AF0
+					>;
+					MFP_DEFAULT;
+				};
+
+				/* MFP_PULL_LOW | MFP_LPM_FLOAT */
+				sdh1_pmx_func1: sdh1_pmx_func1 {
+					pinctrl-single,pins = <
+						MMC1_DAT7 AF0
+						MMC1_DAT6 AF0
+						MMC1_DAT5 AF0
+						MMC1_DAT4 AF0
+						MMC1_WP AF0
+					>;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_FLOAT;
+				};
+
+				/* no pull, no LPM */
+				sdh1_pmx_func2: sdh1_pmx_func2 {
+					pinctrl-single,pins = <
+						MMC1_DAT3 AF0
+						MMC1_DAT2 AF0
+						MMC1_DAT1 AF0
+						MMC1_DAT0 AF0
+					>;
+					MFP_DEFAULT;
+				};
+
+				/* MFP_LPM_DRIVE_LOW */
+				sdh1_pmx_func3: sdh1_pmx_func3 {
+					pinctrl-single,pins = <
+						MMC1_CLK AF0
+					>;
+					MFP_LPM_DRIVE_LOW;
+				};
+
+				/* MFP_PULL_HIGH */
+				sdh1_pmx_func4: sdh1_pmx_func4 {
+					pinctrl-single,pins = <
+						MMC1_CD AF0
+					>;
+					DS_MEDIUM;PULL_UP;EDGE_NONE;LPM_NONE;
+				};
+
+				/* MFP_PULL_UP */
+				sdh1_pmx_func5: sdh1_pmx_func5 {
+					pinctrl-single,pins = <
+						MMC1_CMD AF0
+					>;
+					PULL_UP;LPM_FLOAT;
+				};
+
+				/* SD_DETECT */
+				sdh1_pmx_func6: sdh1_pmx_func6 {
+					pinctrl-single,pins = <
+						GPIO90 AF0
+					>;
+					MFP_LPM_FLOAT;
+				};
+
+				sdh2_pmx_func1_fast: sdh2_pmx_func1_fast {
+					pinctrl-single,pins = <
+						GPIO37 AF1
+						GPIO38 AF1
+						GPIO39 AF1
+						GPIO40 AF1
+						GPIO41 AF1
+					>;
+					DS_FAST;PULL_NONE;EDGE_NONE;LPM_NONE;
+				};
+
+				sdh2_pmx_func2_fast: sdh2_pmx_func2_fast {
+					pinctrl-single,pins = <
+							GPIO42 AF1
+						>;
+						DS_FAST;PULL_NONE;EDGE_NONE;LPM_DRIVE_LOW;
+				};
+
+				sdh2_pmx_func1: sdh2_pmx_func1 {
+					pinctrl-single,pins = <
+						GPIO37 AF1
+						GPIO38 AF1
+						GPIO39 AF1
+						GPIO40 AF1
+						GPIO41 AF1
+					>;
+					MFP_DEFAULT;
+				};
+				/* WLAN_PDn */
+				sdh2_pmx_func3: sdh2_pmx_func3 {
+					pinctrl-single,pins = <
+						GPIO51 AF0
+					>;
+					DS_MEDIUM;PULL_FLOAT;EDGE_NONE;
+				};
+				/* WLAN_SD_CLK */
+				sdh2_pmx_func5: sdh2_pmx_func5 {
+					pinctrl-single,pins = <
+						GPIO42 AF1
+					>;
+					DS_MEDIUM;PULL_NONE;EDGE_NONE;LPM_DRIVE_LOW;
+				};
+
+				sdh2_pmx_edge_wakeup: sdh2_pmx_edge_wakeup {
+						pinctrl-single,pins = <
+							GPIO39 AF1
+						>;
+						DS_MEDIUM;PULL_LOW;EDGE_BOTH;LPM_NONE;
+				};
+
+				/* no pull, no LPM */
+				sdh3_pmx_func1: sdh3_pmx_func1 {
+					pinctrl-single,pins = <
+						ND_IO7 AF1
+						ND_IO6 AF1
+						ND_IO5 AF1
+						ND_IO4 AF1
+						ND_IO3 AF1
+						ND_IO2 AF1
+						ND_IO1 AF1
+						ND_IO0 AF1
+						ND_CLE_SM_OEN AF1
+						SM_BEN0 AF2
+					>;
+					MFP_PULL_UP;
+				};
+
+				/* MFP_LPM_DRIVE_LOW */
+				sdh3_pmx_func2: sdh3_pmx_func2 {
+					pinctrl-single,pins = <
+						SM_SCLK AF1
+					>;
+					MFP_LPM_DRIVE_LOW;
+				};
+
+				lcd_pmx: lcd_pmx {
+					pinctrl-single,pins = <
+						GPIO18 AF0
+						>;
+					DS_MEDIUM;PULL_UP;EDGE_NONE;LPM_DRIVE_HIGH;
+				};
+
+				lcd_esd_pmx: lcd_esd_pmx {
+					pinctrl-single,pins = <
+						GPIO6 AF0
+					>;
+					DS_MEDIUM;PULL_NONE;EDGE_NONE;LPM_DRIVE_HIGH;
+				};
+
+				bl_pmx: bl_pmx {
+					pinctrl-single,pins = <
+						GPIO95 AF0
+						>;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_DRIVE_LOW;
+				};
+
+				uart2_pmx_func1: uart2_pmx_func1 {
+					pinctrl-single,pins = <
+						GPIO47 AF6
+					>;
+					MFP_PULL_UP;
+				};
+
+				uart2_pmx_func2: uart2_pmx_func2 {
+					pinctrl-single,pins = <
+						GPIO48 AF6
+					>;
+					MFP_PULL_UP;
+				};
+
+				uart2_pmx_func1_sleep: uart2_pmx_func1_sleep {
+					pinctrl-single,pins = <
+						GPIO47 AF6
+					>;
+					DS_MEDIUM;PULL_UP;EDGE_BOTH;LPM_FLOAT;
+				};
+
+				uart3_pmx_func: uart3_pmx_func {
+					pinctrl-single,pins = <
+						GPIO45 AF1
+						GPIO46 AF1
+					>;
+					MFP_DEFAULT;
+				};
+
+				twsi0_pmx_func: twsi0_pmx_func {
+					pinctrl-single,pins = <
+						GPIO79 AF1
+						GPIO80 AF1
+					>;
+					MFP_LPM_FLOAT;
+				};
+				twsi0_pmx_gpio: twsi0_pmx_gpio {
+					pinctrl-single,pins = <
+						GPIO79 AF0
+						GPIO80 AF0
+					>;
+					MFP_LPM_FLOAT;
+				};
+				twsi1_pmx_func: twsi1_pmx_func {
+					pinctrl-single,pins = <
+						GPIO87 AF5
+						GPIO88 AF5
+					>;
+					MFP_DEFAULT;
+				};
+				twsi1_pmx_gpio: twsi1_pmx_gpio {
+					pinctrl-single,pins = <
+						GPIO87 AF0
+						GPIO88 AF0
+					>;
+					MFP_LPM_FLOAT;
+				};
+				tsp_int_pmx: tsp_int_pmx {
+					pinctrl-single,pins = <
+						GPIO96 AF0
+					>;
+					MFP_DEFAULT;
+				};
+
+				volumekeys_gpio_pmx: volumekeys_gpio_pmx {
+					pinctrl-single,pins = <
+						GPIO16 AF0		/* VOL UP */
+						GPIO17 AF0		/* VOL DOWN */
+					>;
+					MFP_PULL_UP;
+				};
+
+				homekey_gpio_pmx: homekey_gpio_pmx {
+					pinctrl-single,pins = <
+						GPIO13 AF0		/* HOME */
+					>;
+					MFP_DEFAULT;
+				};
+
+				gpio_keypad_func1: gpio_keypad_func_wakeup { 
+					pinctrl-single,pins = <
+						GPIO13 AF0
+					>;
+					DS_MEDIUM;PULL_UP;EDGE_FALL; 
+				};
+
+				sensors_i2c_pmx: sensors_i2c_pmx {
+					pinctrl-single,pins = <
+						GPIO31 AF0
+						GPIO30 AF0
+					>;
+					DS_MEDIUM;PULL_NONE;EDGE_NONE;LPM_FLOAT;
+				};
+
+				accel_gpio_pmx: accel_gpio_pmx {
+					pinctrl-single,pins = <
+						GPIO10 AF0
+					>;
+					DS_MEDIUM;PULL_DOWN;EDGE_NONE;LPM_FLOAT;
+				};
+
+				accel_suspend_pmx: accel_suspend_pmx {
+                                        pinctrl-single,pins = <
+                                                GPIO10 AF0
+                                        >;
+                                        DS_MEDIUM;PULL_DOWN;EDGE_BOTH;LPM_FLOAT;
+                                };
+
+				gpio_charger_func1: gpio_charger__func1 {
+					pinctrl-single,pins = <
+						GPIO8 AF0
+						>;
+					MFP_PULL_UP;
+				};
+
+				gpio_charger_func2: gpio_charger_func2 {
+					pinctrl-single,pins = <
+						GPIO98 AF0
+					>;
+					DS_MEDIUM;PULL_FLOAT;EDGE_NONE;LPM_FLOAT;
+				};
+
+				proxi_gpio_pmx: proxi_gpio_pmx {
+					pinctrl-single,pins = <
+						GPIO92 AF0
+					>;
+					DS_MEDIUM;PULL_NONE;EDGE_NONE;LPM_FLOAT;
+				};
+
+				vled_gpio_pmx: vled_gpio_pmx {
+					pinctrl-single,pins = <
+						GPIO36 AF0
+					>;
+					MFP_PULL_FLOAT;
+				};
+
+				vib_gpio_pmx: vib_gpio_pmx {
+					pinctrl-single,pins = <
+						GPIO11 AF0
+					>;
+					MFP_DEFAULT;
+				};
+
+				i2s_func: i2s_func {
+					pinctrl-single,pins = <
+						GPIO21 AF1
+						GPIO22 AF1
+						GPIO23 AF1
+						GPIO24 AF1
+					>;
+					MFP_DEFAULT;
+				};
+
+				i2s_gpio: i2s_gpio {
+					pinctrl-single,pins = <
+						GPIO21 AF0
+						GPIO22 AF0
+						GPIO23 AF0
+						GPIO24 AF0
+					>;
+					MFP_DEFAULT;
+				};
+
+				/* no pull, no LPM */
+				dvc_pmx_func: dvc_pmx_func {
+					pinctrl-single,pins = <
+						GPIO43 AF6
+						GPIO44 AF6
+					>;
+					MFP_DEFAULT;
+				};
+
+				connector_i2c_pmx: connector_i2c_pmx {
+					pinctrl-single,pins = <
+						GPIO50 AF0
+						GPIO49 AF0
+					>;
+					DS_MEDIUM;PULL_NONE;EDGE_NONE;LPM_FLOAT;
+				};
+				muic_int_pmx: muic_int_pmx {
+					pinctrl-single,pins = <
+						GPIO54 AF0
+					>;
+					MFP_DEFAULT;
+				};
+
+				gps_pmx_eclk: gps_pmx_eclk {
+					/* eclk */
+					pinctrl-single,pins = <
+						GPIO89 AF5
+					>;
+					MFP_DEFAULT;
+				};
+				gps_pmx_gpio: gps_pmx_gpio {
+					/* gpio */
+					pinctrl-single,pins = <
+						GPIO89 AF0
+					>;
+					MFP_DEFAULT;
+				};
+
+				gps_pmx_poweronoff: gps_pmx_poweronoff {
+					pinctrl-single,pins = <
+						GPIO52 AF0
+					>;
+					MFP_PULL_DOWN;MFP_LPM_DIRVE_LOW;
+				};
+				gps_pmx_reset: gps_pmx_reset {
+					pinctrl-single,pins = <
+						GPIO53 AF0
+					>;
+					MFP_PULL_UP;MFP_LPM_DIRVE_HIGH;
+				};
+
+				muic_remove_pmx: muic_remove_pmx {
+					pinctrl-single,pins = <
+						GPIO54 AF0
+					>;
+					DS_MEDIUM;PULL_UP;EDGE_BOTH;LPM_FLOAT;
+				};
+
+
+				gssp_func: gssp_func {
+					pinctrl-single,pins = <
+						GPIO25 AF1
+						GPIO26 AF1
+						GPIO27 AF1
+						GPIO28 AF1
+					>;
+					MFP_DEFAULT;
+				};
+
+				gssp_gpio: gssp_gpio {
+					pinctrl-single,pins = <
+						GPIO25 AF0
+						GPIO26 AF0
+						GPIO27 AF0
+						GPIO28 AF0
+					>;
+					MFP_DEFAULT;
+				};
+
+				codec_int: codec_int_gpio {
+					pinctrl-single,pins = <
+						GPIO124 AF0
+					>;
+					PULL_UP;
+				};
+
+				gdet_gpio: gdet_gpio {
+					pinctrl-single,pins = <
+						GPIO12 AF0
+					>;
+					MFP_PULL_FLOAT;LPM_PULL_FLOAT;
+				};
+			};
+
+			twsi0: i2c@d4011000 {
+				pinctrl-names = "default","gpio";
+				pinctrl-0 = <&twsi0_pmx_func>;
+				pinctrl-1 = <&twsi0_pmx_gpio>;
+				i2c-gpio = <&gpio 79 0 &gpio 80 0>;
+				marvell,i2c-always-on;
+				status = "okay";
+
+			};
+
+			twsi1: i2c@d4010800 {
+				pinctrl-names = "default","gpio";
+				pinctrl-0 = <&twsi1_pmx_func>;
+				pinctrl-1 = <&twsi1_pmx_gpio>;
+				i2c-gpio = <&gpio 87 0 &gpio 88 0>;
+				status = "okay";
+
+				MMS134S@48 {
+					compatible = "melfas,mms134s";
+					reg = <0x48>;
+
+					melfas,max_x = <479>;
+					melfas,max_y = <799>;
+					melfas,irqflags = <IRQF_ONESHOT>;
+					melfas,vdd_regulator_volt = <3000000>;
+					melfas,gpio_int = <&gpio 96 GPIO_ACTIVE_LOW>;
+					melfas,inkernel_fw_name = "melfas/G3568V_ME_02.fw";
+
+					pinctrl-names = "default";
+					pinctrl-0 = <&tsp_int_pmx>;
+					interrupt-parent = <&gpio>;
+					interrupts = <96 IRQ_TYPE_EDGE_FALLING>;
+					v_tsp_3v0-supply = <&ldo9>;
+				};
+			};
+
+			twsi2: i2c@d4037000 {
+				status = "okay";
+
+				pmic: 88pm822@30 {
+					reg = <0x30>;
+					interrupts = <0 4 0x4>;
+					interrupt-parent = <&gic>;
+					dvc {
+						compatible = "marvell,88pm8xx-dvc";
+						/* pm822 dvc affect buck1/3/5, affected 32bit = (1 << 4) | (1 << 2) | (1 << 0)*/
+						dvc-affected-buckbits = <21>;
+						pinctrl-names = "default";
+						pinctrl-0 = <&dvc_pmx_func>;
+					};
+					usb: usb {
+						compatible = "marvell,88pm80x-usb";
+						vbus-gpio = <0xff>;
+						id-gpadc = <0xff>;
+					};
+
+				};
+				pmic2: 88pm805@38 {
+					compatible = "marvell,88pm805";
+					reg = <0x38>;
+					interrupt-parent = <&gpio>;
+					interrupts = <124 0x1>;
+					marvell,88pm805-irq-write-clear;
+					pinctrl-names = "default";
+					pinctrl-0 = <&codec_int>;						
+				};
+				sec-charger@6A {
+					compatible = "samsung,sec-charger";
+					pinctrl-names = "default";
+					pinctrl-0 = <&gpio_charger_func1 &gpio_charger_func2>;
+					reg = <0x6A>;
+					interrupt-parent = <&gpio>;
+					interrupts = <8 0x3>;
+					chgirq-gpio = <&gpio 8 0>;
+					chgen-gpio = <&gpio 98 0>;
+					chg-irq-attr = <IRQ_TYPE_EDGE_BOTH>;
+					chg-float-voltage = <4350>;
+				};
+			};
+
+			acipc: acipc@d401d000 {
+				status = "okay";
+			};
+
+			seh: seh@d4080000 {
+				compatible = "mrvl,seh";
+				reg = <0xd4080000 0x100>;
+				interrupts = <0 32 0x4>;
+				interrupt-names = "CP_TIMER2_3";
+				watchdog-type = <1>; /* soc timer */
+				timer-num = <2>; /* timer num */
+				match-num = <0>; /* match num */
+				status = "okay";
+			};
+		};
+		soc-camera@0 {
+			 status = "okay";
+		};
+		sound {
+			compatible = "marvell,pxa-88pm805-snd-card";
+			ssp-controllers = <&ssp_dai1 &ssp_dai4>;
+		};
+
+		/*
+		 * ramoops:
+		 * 256 KB memory starts at 0x8100000
+		 * pstore dump: 2 chunks, totall 64 KB, 32 KB each
+		 * console size: 192 KB
+		 * no dump_oops
+		 */
+		ramoops {
+			compatible = "pstore,ramoops";
+			mem-size = <0x40000>;
+			mem-address = <0x8100000>;
+			record-size = <0x8000>;
+			console-size = <0x30000>;
+			dump-oops = <0>;
+			status = "okay";
+		};
+		sec-log {
+			compatible = "sec-log";
+			status = "okay";
+		};
+	};
+
+	sensori2c: i2c-gpio@5 {
+		compatible = "i2c-gpio";
+		gpios = <&gpio 31 0
+			 &gpio 30 0>;
+
+		i2c-gpio,delay-us = <3>;
+		i2c-gpio,timeout-ms = <100>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&sensors_i2c_pmx>;
+
+		status = "okay";
+
+		bma@10 {
+			compatible = "bosch,bma2x2";
+			reg = <0x10>;
+
+			pinctrl-names = "default","sleep";
+			pinctrl-0 = <&accel_gpio_pmx>;
+			pinctrl-1 = <&accel_suspend_pmx>;
+
+			bma2x2,gpio_int = <&gpio 10 GPIO_ACTIVE_HIGH>;
+			interrupt-parent = <&gpio>;
+			interrupts = <10 IRQ_TYPE_EDGE_RISING>;
+
+			bma2x2,supply_type = <1>;
+			v_sensor_2v85-supply = <&ldo11>;
+			bma2x2,vdd_regulator_volt = <2850000>;
+
+			bma2x2,accel_place = <6>;
+		};
+
+		bmm@12 {
+			compatible = "bosch,bmm050";
+			reg = <0x12>;
+
+			bmm050,magnetic_place = <6>;
+		};
+
+		proxi@44 {
+                        compatible = "sharp,gp2a";
+                        reg = <0x44>;
+
+                        pinctrl-names = "default";
+                        pinctrl-0 = <&proxi_gpio_pmx &vled_gpio_pmx>;
+
+                        interrupt-parent = <&gpio>;
+                        interrupts = <92 IRQ_TYPE_EDGE_FALLING>;
+                        proxi_int_gpio = <&gpio 92 GPIO_ACTIVE_HIGH>;
+
+			gp2a,vdd_supply_type = <1>;
+			gp2a,vdd_regulator_volt = <3100000>;
+			proxi_vdd-supply = <&ldo1>;
+
+			gp2a,vled_supply_type = <0>;
+                        gp2a,vled_ldo_en = <&gpio 36 GPIO_ACTIVE_HIGH>;
+                };
+	};
+
+	connectori2c: i2c@7 {
+
+		compatible = "i2c-gpio";
+		gpios = <&gpio 50 0
+			 &gpio 49 0>;
+
+		i2c-gpio,sda-open-drain;
+		i2c-gpio,scl-open-drain;
+		i2c-gpio,delay-us = <3>;
+		i2c-gpio,timeout-ms = <100>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&connector_i2c_pmx>;
+
+		status = "okay";
+
+		muic: muic@14 {
+			compatible = "richtek,rt8973";
+			pinctrl-names = "default","remove";
+			pinctrl-0 = <&muic_int_pmx>;
+			pinctrl-1 = <&muic_remove_pmx>;
+			reg = <0x14>;
+                        interrupt-parent = <&gpio>;
+			interrupts = <54 0x1>;
+			richtek,gpio_int = <&gpio 54 0>;
+			irq-gpio = <&gpio 54 0>;
+		};
+	};
+
+	ion {
+		marvell,ion-nr = <2>;
+		status = "okay";
+		heap1 {
+			marvell,ion-name = "carveout_heap";
+			marvell,ion-type = <2>;
+			marvell,ion-id = <2>;
+		};
+
+		heap2 {
+			marvell,ion-name = "system_heap";
+			marvell,ion-type = <0>;
+			marvell,ion-id = <0>;
+		};
+	};
+
+	panel {
+		compatible = "marvell,mmp-dsi-panel";
+		pinctrl-names = "default";
+		pinctrl-0 = <&lcd_pmx &lcd_esd_pmx>;
+		marvell,path-name = "mmp_pnpath";
+		marvell,dsi-panel = <&mmp_dsi_panel>;
+		interrupt-parent = <&gpio>;
+		interrupts = <6 IRQ_TYPE_EDGE_RISING>;
+		marvell,panel-esd-en;
+		marvell,panel-esd-gpio = <&gpio 6 GPIO_ACTIVE_HIGH>;
+		marvell,panel-esd-type = <IRQ_TYPE_EDGE_RISING>;
+		marvell,panel-backlight = <&backlight>;
+		panel-ext-pin {
+			/*
+			 * Three properties are required
+			 * to control pwr pin
+			 * @node : panel-ext-pin node
+			 * @on : <0> - off / <1> - on
+			 * @usec : delay time of usec
+			 */
+			panel-ext-pin-on = <
+				&panel_pwr_avdd  1 20000
+				&panel_pwr_rst   1 10000
+				&panel_pwr_rst   0 10000
+				&panel_pwr_rst   1 120000
+			>;
+			panel-ext-pin-off = <
+				&panel_pwr_avdd  0 1000
+			>;
+			/*
+			 * There are four properties to define pwr pin
+			 * <prefix>-name : pin name
+			 * <prefix>-type : <0> - GPIO, <1> - PMIC Regulator
+			 * <prefix>-gpio : If the type is GPIO, assign a gpio.
+			 * <prefix>-supply : If the type is PMIC Regulator, assign a regulator.
+			 */
+			panel_pwr_rst: panel-pwr-rst {
+				panel-ext-pin-name = "rst";
+				panel-ext-pin-type = <EXT_PIN_GPIO>;
+				panel-ext-pin-gpio = <&gpio 18 GPIO_ACTIVE_LOW>;
+			};
+			panel_pwr_avdd: panel-pwr-avdd {
+				panel-ext-pin-name = "avdd";
+				panel-ext-pin-type = <EXT_PIN_REGULATOR>;
+				panel-ext-pin-supply = <&ldo1>;
+				panel-ext-pin-gpio;
+			};
+		};
+		mmp_dsi_panel: mmp-dsi-panel {};
+	};
+
+	panel-modes {
+		/*
+		 * xres and yres are added for calculating
+		 * framebuffer size.
+		 * If this node is not added, it will take default
+		 * size defined in drivers/video/mmp/setup.c
+		 */
+		compatible = "mmp-panel-modes";
+		xres = <480>;
+		yres = <800>;
+	};
+/*	
+	sd8xxx-wlan {
+		drv_mode = <0x5>;
+		cfg80211_wext = <0xc>;
+		sta_name = "wlan";
+		wfd_name = "p2p";
+		max_vir_bss = <1>;
+		drvdbg = <0x80007>;
+		init_cfg = "mrvl/wifi_init_cfg.conf";
+		reg_alpha2 = "US";
+		p2p_enh = <1>;
+	};
+
+	sd8xxx-bt {
+		init_cfg = "mrvl/bt_init_cfg.conf";
+	};
+*/	
+	gps: mmp-gps {
+		compatible = "marvell,mmp-gps";
+		marvell,gps-eclk-ctrl;
+
+		vgps-supply = <&ldo13>;
+
+		pinctrl-names = "default", "idle";
+		pinctrl-0 = <&gps_pmx_eclk &gps_pmx_poweronoff &gps_pmx_reset>;
+		pinctrl-1 = <&gps_pmx_gpio>;
+
+		on-off-gpio = <&gpio 52 0>;
+		reset-n-gpio = <&gpio 53 0>;
+	};
+
+	sd8x-rfkill {
+		sd-host = <&sdh2>;
+		pd-gpio = <&gpio 51 0>;
+		rst-gpio = <&gpio 0 0>;
+		edge-wakeup-gpio = <&gpio 39 0>;
+		v_wib_3v3-supply=<&ldo10>;
+		status = "okay";
+	};
+
+	battery {
+		status = "okay";
+		compatible = "samsung,sec-battery";
+
+		vendor = "SDI SDI";
+		charger_name = "sec-charger";
+		fuelgauge_name = "sec-fuelgauge";
+		technology = <2>; /* POWER_SUPPLY_TECHNOLOGY_LION */
+
+		chip_vendor = "LSI";
+
+		polling_time = <2 2 10 10 300>;
+
+		temp_table_adc = <276 326 383 455 530 629 740 787 866 1013
+			1181 1361 1564 1792 2024 2263 2493 2728 2948 3011
+			3135 3208 3313 3465 3588 3698 3779>;
+		temp_table_data = <900 850 800 750 700 650 600 580 550 500
+			450 400 350 300 250 200 150 100 50 30
+			0 (-20) (-50) (-100) (-150) (-200) (-250)>;
+
+		input_current_limit = <0 0 0 750 550 550 550 550 550 0 550 750>;
+		fast_charging_current = <0 0 0 750 500 500 500 500 500 0 500 750>;
+		full_check_current_1st = <0 0 0 200 150 150 150 150 150 0 150 150>;
+		full_check_current_2nd = <0 0 0 2400 1800 1800 1800 1800 1800 0 1800 1800>;
+
+		adc_check_count = <5>;
+
+		cable_check_type = <8>; /* SEC_BATTERY_CABLE_CHECK_INT */
+		cable_source_type = <1>; /* SEC_BATTERY_CABLE_SOURCE_EXTERNAL */
+		event_waiting_time = <60>;
+		polling_type = <1>; /* SEC_BATTERY_MONITOR_ALARM */
+		monitor_initial_count = <3>;
+
+		battery_check_type = <4>; /* SEC_BATTERY_CHECK_FUELGAUGE */
+		check_count = <1>;
+		check_adc_max = <600>;
+		check_adc_min = <50>;
+
+		ovp_uvlo_check_type = <3>; /* SEC_BATTERY_OVP_UVLO_CHGPOLLING */
+
+		thermal_source = <0>; /* SEC_BATTERY_THERMAL_SOURCE_FG */
+
+		temp_check_type = <2>; /* _BATTERY_TEMP_CHECK_TEMP */
+		temp_check_count = <1>;
+		temp_high_threshold_event = <1000>;
+		temp_high_recovery_event = <400>;
+		temp_low_threshold_event = <(-50)>;
+		temp_low_recovery_event = <0>;
+		temp_high_threshold_normal = <1000>;
+		temp_high_recovery_normal = <400>;
+		temp_low_threshold_normal = <(-50)>;
+		temp_low_recovery_normal = <0>;
+		temp_high_threshold_lpm = <1000>;
+		temp_high_recovery_lpm = <400>;
+		temp_low_threshold_lpm = <(-50)>;
+		temp_low_recovery_lpm = <0>;
+		full_check_type = <6>; /* SEC_BATTERY_FULLCHARGED_CHGINT */
+		full_check_type_2nd = <3>; /* SEC_BATTERY_FULLCHARGED_TIME */
+		full_check_count = <1>;
+		chg_gpio_full_check = <0>;
+		chg_polarity_full_check = <1>;
+
+		/* SEC_BATTERY_FULL_CONDITION_SOC |
+		   SEC_BATTERY_FULL_CONDITION_NOTIMEFULL */
+		full_condition_type = <5>;
+		full_condition_soc = <95>;
+		full_condition_vcell = <4300>;
+
+		recharge_check_count = <2>;
+		recharge_condition_type = <2>; /* SEC_BATTERY_RECHARGE_CONDITION_AVGVCELL */
+		recharge_condition_soc = <98>;
+		recharge_condition_avgvcell = <4290>;
+		recharge_condition_vcell = <4290>;
+
+		charging_total_time = <21600>;
+		recharging_total_time = <5400>;
+		charging_reset_time = <600>;
+	};
+
+	sec-fuelgauge {
+		capacity-max = <1000>;
+		capacity-max-margin = <30>;
+		capacity-min = <0>;
+		fg-irq-attr = <IRQ_TYPE_EDGE_FALLING>;
+		fuel-alert-soc = <1>;
+		temp_adc_channel = <2>; /* PM822_GPADC2 */
+	};
+
+	vibrator: vibrator {
+	compatible = "marvell,android-vibrator";
+	pinctrl-names = "default";
+	pinctrl-0 = <&vib_gpio_pmx>;
+	android_vibrator,vib_ldo_en = <&gpio 11 GPIO_ACTIVE_HIGH>;
+	};
+	
+	backlight: ktd253 {
+		compatible = "kinetic,backlight-ktd253";
+		pinctrl-names = "default";
+		pinctrl-0 = <&bl_pmx>;
+		ktd,ctrl-gpio = <&gpio 95 0>;
+		ktd,pwm-en-gpio;
+		ktd,backlight-brt-range = <
+			0	0	/* OFF */
+			30	31	/* DIM */
+			30	31	/* MIN */
+			143	19	/* DEF */
+			255	1	/* MAX */
+		>;
+	};
+
+	sec-thermistor {
+		compatible = "samsung,sec-thermistor";
+		status = "okay";
+		adc-channel = <1>;
+
+		adc_array = <92 94 95 97 98 100 106 111 117 122 128 130 133 135 138 140 145 150 155 160 165
+				  171 177 183 189 195 205 216 226 237 247 268 288 309 329 350 360 370 380 390 400 410
+				  420 430 440 450 470 490 510 530 550 570 590 610 630 650 672 693 715 736 758 766 775
+				  783 792 800 826 852 877 903 929>;
+
+		temp_array = <600 590 580 570 560 550 540 530 520 510 500 490 480 470 460 450 440 430 420 410
+				   400 390 380 370 360 350 340 330 320 310 300 290 280 270 260 250 240 230 220 210 200
+				   190 180 170 160 150 140 130 120 110 100 90 80 70 60 50 40 30 20 10 0 (-10) (-20)
+				   (-30) (-40) (-50) (-60) (-70) (-80) (-90) (-100)>;
+	};
+};
+/include/ "88pm8xx.dtsi"
+&pmic {
+	regulators {
+		BUCK4 {
+			regulator-compatible = "88PM800-BUCK4";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-boot-on;
+			regulator-always-on;
+		};
+		buck5: BUCK5 {
+			regulator-compatible = "88PM800-BUCK5";
+			regulator-min-microvolt = <600000>;
+			regulator-max-microvolt = <3950000>;
+		};
+		LDO6 {
+			regulator-compatible = "88PM800-LDO6";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <3300000>;
+		};
+		LDO7 {
+			regulator-compatible = "88PM800-LDO7";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-boot-on;
+			regulator-always-on;
+		};
+	};
+	headset {
+		compatible = "marvell,88pm80x-headset";
+		marvell,switch-name = "h2w";
+		marvell,headset-flag = <0>;
+		marvell,hook-press-th = <127>;
+		marvell,vol-up-press-th = <258>;
+		marvell,vol-down-press-th = <604>;
+		marvell,mic-det-th = <750>;
+		marvell,press-release-th = <605>;
+		marvell,micbias-supply = <&ldo14>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&gdet_gpio>;
+		headset-gdet-gpio = <&gpio 12 0>;
+	};
+};
+/include/ "mmp-dsi-panel-sc7798a-boe-wvga-video.dtsi"
+/include/ "mmp-dsi-panel-sc7798a-dtc-wvga-video.dtsi"
+/include/ "mmp-dsi-panel-sc7798a-cpt-wvga-video.dtsi"

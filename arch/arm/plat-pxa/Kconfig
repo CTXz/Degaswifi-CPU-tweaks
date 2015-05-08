@@ -1,0 +1,20 @@
+if PLAT_PXA
+
+config PXA_SSP
+	tristate
+	help
+	  Enable support for PXA2xx SSP ports
+
+config PXA_PANIC_FLUSH
+        bool "PXA cache flush when panic"
+        depends on KEXEC
+        help
+          Enable support for flush all cache during panic
+
+config DUMP_REGS
+       bool
+       default n
+       depends on (ARCH_PXA || ARCH_MMP)
+       help
+         Dump soc registers, stack, and possible functions in the stack
+endif

@@ -1,0 +1,163 @@
+&mmp_dsi_panel {
+	dsi_sc7798a_boe_wvga_vid: marvell,dsi-panel-sc7798a-boe-wvga-video {
+		marvell,dsi-panel-manu = "BOE";     /* condensed manufacturer name */
+		marvell,dsi-panel-name = "sc7798a-boe";
+		marvell,dsi-panel-id = <0x55B8F0>;
+		marvell,dsi-panel-type = "video_mode";
+		marvell,dsi-panel-xres = <480>;
+		marvell,dsi-panel-yres = <800>;
+		marvell,dsi-panel-width= <56>;      /* screen width in mm */
+		marvell,dsi-panel-height = <93>;    /* screen height in mm */
+		marvell,dsi-h-front-porch = <90>;   /* right margin */
+		marvell,dsi-h-back-porch = <70>;    /* left margin */
+		marvell,dsi-h-sync-width = <60>;    /* hsync len */
+		marvell,dsi-v-front-porch = <8>;    /* lower margin */
+		marvell,dsi-v-back-porch = <12>;    /* upper margin */
+		marvell,dsi-v-sync-width = <4>;     /* vsync len */
+		marvell,dsi-hsync-invert = <0>;     /* hsync invert */
+		marvell,dsi-vsync-invert = <0>;     /* vsync invert */
+		marvell,dsi-lanes = <2>;
+		marvell,dsi-burst-mode = <2>;
+		marvell,dsi-master-mode;
+		marvell,dsi-hfp-en;
+		marvell,dsi-hbp-en;
+		/*
+		 * DSI PACKET HEADER INFO
+		 * @ data type : 1byte
+		 * @ delay(msec) : 2byte
+		 * @ size of data : 2byte
+		 */ 
+		marvell,dsi-panel-init-cmds = [
+			39 00 00 00 04	B9 F1 08 00
+			39 00 00 00 08	B1 32 19 19 22 33 01 B7
+			39 00 00 00 05	E3 05 05 04 05
+			39 00 00 00 03	B8 04 22
+			39 00 00 00 02	BC 67
+			39 00 0A 00 06	C0 73 50 00 08 70
+			39 00 00 00 13	BA 31 00 44 25 91 0A 00 00 C2 34 00 00 04 02 1D
+					B9 EE 40
+			39 00 00 00 04	C6 00 00 FF
+			39 00 00 00 02	CC 0C
+			39 00 00 00 02	B2 03
+			39 00 00 00 02	B4 02
+			39 00 00 00 09	B3 00 00 00 00 10 0A 25 20
+			39 00 00 00 34	E9 00 00 05 00 00 47 43 12 30 00 38 08 47 43 47
+					00 60 00 00 00 00 1C 88 88 86 64 42 20 00 29 88
+					88 88 87 75 53 31 11 39 88 00 00 00 01 00 00 00
+					00 00 00 00
+			39 00 00 00 25	EA 88 88 91 13 35 57 73 18 88 88 88 90 02 24 46
+					62 08 88 03 01 00 FF 00 90 00 00 00 00 00 00 00
+					00 00 00 00 00
+			39 00 00 00 02	B0 01
+			39 00 00 00 03	B5 00 00
+			39 00 00 00 23	E0 00 00 01 0D 0D 3F 18 2E 00 0D 0F 12 10 16 16
+					10 12 00 00 01 0D 0D 3F 17 2D 00 0D 0F 18 1D 16
+					15 10 12
+			39 00 00 00 80	C1 01 00 08 10 17 1D 26 2E 34 3F 48 51 59 60 68
+					70 78 80 88 90 98 A0 A8 B0 B8 C0 C8 D0 D8 E0 E8
+					F2 F8 FF 00 00 00 00 00 00 00 00 00 00 08 10 17
+					1D 26 2E 34 3F 48 51 59 60 68 70 78 80 88 90 98
+					A0 A8 B0 B8 C0 C8 D0 D8 E0 E8 F2 F8 FF 00 00 00
+					00 00 00 00 00 00 00 08 10 17 1D 26 2E 34 3F 48
+					51 59 60 68 70 78 80 88 90 98 A0 A8 B0 B8 C0 C8
+					D0 D8 E0 E8 F2 F8 FF 00 00 00 00 00 00 00 00 00
+		];
+		marvell,dsi-panel-init-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-enable-cmds = [
+			05 00 78 00 01	11
+			05 00 0A 00 01	29
+		];
+		marvell,dsi-panel-enable-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-disable-cmds = [
+			05 00 0A 00 01	28
+			05 00 78 00 01	10
+		];
+		marvell,dsi-panel-disable-cmds-txmode = "dsi-hs-mode";
+		/* 
+		 * [MDNIE LITE]
+		 * To enable : marvell,dsi-panel-mdnie-support
+		 * To disable : marvell,dsi-panel-mdnie-not-support
+		 */
+		marvell,dsi-panel-mdnie-support;
+		marvell,dsi-panel-mdnie-cmd-reg = [E6];
+		marvell,dsi-panel-mdnie-cmd-len = <0x71>;
+		marvell,dsi-panel-mdnie-ui-mode-cmds = [
+			39 00 00 00 71	E6 5A 00 00 03 00 00 00 00 00 00 00 00 00 00 00
+					00 00 00 00 00 00 00 FF 00 FF 00 FF FF 00 00 FF
+					00 FF 00 FF FF 00 00 FF 00 FF 00 FF FF 00 02 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 05
+					C6 1E D3 1F 67 1F C6 04 D3 1F 67 1F C6 1E D3 05
+					67
+		];
+		marvell,dsi-panel-mdnie-ui-mode-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-mdnie-video-mode-cmds = [
+			39 00 00 00 71	E6 5A 00 00 03 00 00 00 00 00 00 00 00 00 00 00
+					00 00 00 00 00 00 00 FF 00 FF 00 FF FF 00 00 FF
+					00 FF 00 FF FF 00 00 FF 00 FF 00 FF FF 00 06 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 05
+					10 1F 4C 1F A4 1F DD 04 7F 1F A4 1F DD 1F 4C 04
+					D7
+		];
+		marvell,dsi-panel-mdnie-video-mode-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-mdnie-camera-mode-cmds = [
+			39 00 00 00 71	E6 5A 00 00 03 00 00 00 00 00 00 00 00 00 00 00
+					00 00 00 00 00 00 00 FF 00 FF 00 FF FF 00 00 FF
+					00 FF 00 FF FF 00 00 FF 00 FF 00 FF FF 00 06 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 05
+					10 1F 4C 1F A4 1F DD 04 7F 1F A4 1F DD 1F 4C 04
+					D7
+		];
+		marvell,dsi-panel-mdnie-camera-mode-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-mdnie-gallery-mode-cmds = [
+			39 00 00 00 71	E6 5A 00 00 03 00 00 00 00 00 00 00 00 00 00 00
+					00 00 00 00 00 00 00 FF 00 FF 00 FF FF 00 00 FF
+					00 FF 00 FF FF 00 00 FF 00 FF 00 FF FF 00 02 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 05
+					10 1F 4C 1F A4 1F DD 04 7F 1F A4 1F DD 1F 4C 04
+					D7
+		];
+		marvell,dsi-panel-mdnie-gallery-mode-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-mdnie-negative-mode-cmds = [
+			39 00 00 00 71	E6 5A 00 00 30 00 00 00 00 00 00 00 00 00 00 00
+					00 00 00 00 00 00 FF 00 FF 00 FF 00 00 FF FF 00
+					FF 00 FF 00 00 FF FF 00 FF 00 FF 00 00 FF 02 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 20
+					00 20 00 20 00 20 00 20 00 20 00 20 00 20 00 05
+					C6 1E D3 1F 67 1F C6 04 D3 1F 67 1F C6 1E D3 05
+					67
+		];
+		marvell,dsi-panel-mdnie-negative-mode-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-backlight-on-cmds = [
+			15 00 00 00 02	C7 80
+			39 00 00 00 03	C8 11 00
+			15 00 00 00 02	53 24
+		];
+		marvell,dsi-panel-backlight-on-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-backlight-set-brightness-cmds = [
+			15 00 00 00 02	51 8F
+		];
+		marvell,dsi-panel-backlight-set-brightness-cmds-txmode = "dsi-hs-mode";
+		marvell,dsi-panel-backlight-get-brightness-reg = [52];
+		marvell,dsi-panel-read-id-regs = [DA DB DC];
+		marvell,dsi-panel-read-status-reg = [0A];
+		marvell,dsi-panel-read-status-ok = [9A];
+		status = "okay";
+		marvell,dsi-panel-temp-compensation {
+			temp-compensation-0 {
+				old-data = [B4 02];
+				new-data = [B4 01];
+				trig-type = <0>;	/* 0 : TEMPERATURE_LOW, 1 : TEMPERATURE_HIGH */
+				temperature = <263>;	/* Absolute Temperature (Celsius + 273)*/
+			};
+		};
+	};
+};

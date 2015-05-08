@@ -1,0 +1,55 @@
+/*
+ * Eden FPGA Board
+ */
+
+/dts-v1/;
+#include "eden.dtsi"
+
+/ {
+	model = "Eden";
+	compatible = "mrvl,eden-fpga", "mrvl,eden";
+
+	memory@0 {
+		device_type = "memory";
+		reg = <0 0 0x20000000>;
+	};
+
+	soc {
+		interrupt-parent = <&intc>;
+		axi@d4200000 {
+			intc: interrupt-controller@d4284000 {
+				status = "okay";
+			};
+		};
+
+		apb@d4000000 {
+			uart1: uart@d4030000 {
+				interrupts = <27>;
+				status = "okay";
+
+				uart0_clksrc {
+					clksrc = "vctcxo";
+				};
+			};
+
+			timer: timer@d4080000 {
+				marvell,timer-loop_delay = <1440>;
+
+				counter1 {
+					interrupts = <32>;
+				};
+			};
+
+			gpio: gpio@d4019000 {
+				interrupts = <49>;
+				status = "okay";
+			};
+
+			pmx: pinmux@d401e000 {
+				status = "okay";
+				/* pin base, nr pins & gpio function */
+				pinctrl-single,gpio-range = <EDEN_GPIO_PINMUX>;
+			};
+		};
+	};
+};

@@ -1,0 +1,31 @@
+/dts-v1/;
+#include "pxa1L88-dkb.dtsi"
+/ {
+	compatible = "mrvl,pxa1L88-tablet-v10", "mrvl,pxa1L88";
+	soc {
+		axi@d4200000 {	/* AXI */
+			usbphy: usbphy@d4207000 {
+				status = "okay";
+			};
+
+			ehci: ehci@d4208100 {
+				status = "okay";
+			};
+
+			otg: otg@d4208100 {
+				status = "okay";
+			};
+
+		};
+		apb@d4000000 {
+			twsi2: i2c@d4037000 {
+				pmic3: 88pm830@68 {
+					usb {
+						compatible = "marvell,88pm830-vbus";
+						gpadc-number = <1>;
+					};
+				};
+			};
+		};
+	};
+};

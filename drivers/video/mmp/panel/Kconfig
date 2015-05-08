@@ -1,0 +1,85 @@
+config MMP_PANEL_BACKLIGHT
+	bool "mmp panel backlighg support"
+	default n
+	help
+		mmp panel backlight support.
+		It is controlled by command of LDI.
+
+config MMP_PANEL_MDNIE
+	bool "mDNIe-LITE support"
+	default n
+	help
+		mDNIe-LITE support
+
+config MMP_PANEL_TFT_GENERIC
+	bool "MIPI Generic TFT-LCD support"
+	default n
+	help
+		MIPI Generic TFT-LCD support
+
+config MMP_PANEL_TPOHVGA
+	bool "tpohvga panel TJ032MD01BW support"
+	depends on SPI_MASTER
+	default n
+	help
+		tpohvga panel support
+
+config MMP_PANEL_NT35565
+	bool "MIPI panel NT35565 support"
+	default n
+	help
+		MIPI panel NT35565 support
+
+config MMP_PANEL_R63311
+	bool "MIPI Sharp panel R63311 support"
+	default n
+	help
+		MIPI Sharp 1080p panel support
+
+config MMP_PANEL_LG4591
+	bool "MIPI panel LG4591 support"
+	default n
+	help
+		MIPI panel LG4591 support
+
+config MMP_PANEL_OTM1281A
+	bool "MIPI panel OTM1281A support"
+	default n
+	help
+		MIPI panel OTM1281A support
+
+config MMP_PANEL_TD043MGEA1
+	bool "parallel panel TD043MGEA1 support"
+	default n
+	help
+		parallel panel TD043MGEA1 support
+
+config MMP_PANEL_NT35510
+	bool "MIPI panel NT35510 support"
+	default n
+	help
+		MIPI panel NT35510 support
+
+config MMP_PANEL_S6D7AA0X
+	bool "MIPI panel S6D7AA0X support"
+	default n
+	help
+		MIPI panel SD67AA0X support
+
+config MMP_PANEL_EA8868B
+	bool "MIPI panel EA8868B support"
+	default n
+	help
+		MIPI panel EA8868B support
+
+config MMP_PANEL_SC7798A
+	bool "MIPI panel SC7798A support"
+	default n
+	help
+		MIPI panel SC7798A support
+
+config MMP_PANEL_TFT1080P_1E
+	bool "MIPI TFT panel 1080p support"
+	default n
+	help
+		MIPI TFT 1080p panel support

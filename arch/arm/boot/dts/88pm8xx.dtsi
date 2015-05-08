@@ -1,0 +1,153 @@
+/* arch/arm/boot/dts/88pm822.dtsi
+ * Copyright (C) 2014 Samsung Electronics Co, Ltd.
+ *
+ * Based on arch/arm/boot/dts/pxa1L88dkb.dts
+ *
+ * This software is licensed under the terms of the GNU General Public
+ * License version 2, as published by the Free Software Foundation,
+ * and may be copied, distributed, and modified under those terms.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ */
+
+/*
+ * Integrated Power Management Chip for PM822 pmic
+ */
+&pmic {
+	compatible = "marvell,88pm822";
+	reg = <0x30>;
+	interrupts = <0 4 0x4>;
+	interrupt-parent = <&gic>;
+	interrupt-controller;
+	#interrupt-cells = <1>;
+	marvell,88pm800-irq-write-clear;
+	marvell,88pm822-power-page-addr = <0x31>;
+	marvell,88pm822-gpadc-page-addr = <0x32>;
+
+	regulators {
+			compatible = "marvell,88pm80x-regulator";
+
+			/* LDOs which are always on doesn't require labels
+			* as there will be no -supply property attached to it,
+			* by any of the peripheral.
+			* ie no driver will request to enable disable these LDOs
+			*/
+			BUCK1 {
+				regulator-compatible = "88PM800-BUCK1";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt = <1800000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			BUCK2 {
+				regulator-compatible = "88PM800-BUCK2";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			BUCK3 {
+				regulator-compatible = "88PM800-BUCK3";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			buck5: BUCK5 {
+				regulator-compatible = "88PM800-BUCK5";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt	= <3950000>;
+			};
+
+			ldo1: LDO1 {
+				regulator-compatible = "88PM800-LDO1";
+				regulator-min-microvolt = <1700000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+			};
+			LDO2 {
+				regulator-compatible = "88PM800-LDO2";
+				regulator-min-microvolt = <1700000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			LDO3 {
+				regulator-compatible = "88PM800-LDO3";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			ldo4: LDO4 {
+				regulator-compatible = "88PM800-LDO4";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <3300000>;
+			};
+			ldo5: LDO5 {
+				regulator-compatible = "88PM800-LDO5";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <3300000>;
+			};
+			LDO8 {
+				regulator-compatible = "88PM800-LDO8";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			ldo9: LDO9 {
+				regulator-compatible = "88PM800-LDO9";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <3300000>;
+			};
+			ldo10: LDO10 {
+				regulator-compatible = "88PM800-LDO10";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			ldo11: LDO11 {
+				regulator-compatible = "88PM800-LDO11";
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <3300000>;
+			};
+			ldo12: LDO12 {
+				regulator-compatible = "88PM800-LDO12";
+				regulator-min-microvolt = <600000>;
+				regulator-max-microvolt = <1500000>;
+			};
+			ldo13: LDO13 {
+				regulator-compatible = "88PM800-LDO13";
+				regulator-min-microvolt = <1700000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+			ldo14: LDO14 {
+				regulator-compatible = "88PM800-LDO14";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <2900000>;
+			};
+			voutsw: VOUTSW {
+				regulator-compatible = "88PM800-VOUTSW";
+				regulator-min-microvolt = <1700000>;
+				regulator-max-microvolt = <1800000>;
+			};
+	};
+	headset {
+		compatible = "marvell,88pm80x-headset";
+		marvell,switch-name = "h2w";
+		marvell,headset-flag = <0>;
+		marvell,hook-press-th = <60>;
+		marvell,vol-up-press-th = <250>;
+		marvell,vol-down-press-th = <500>;
+		marvell,mic-det-th = <600>;
+		marvell,press-release-th = <600>;
+		marvell,micbias-supply = <&ldo14>;
+	};
+};

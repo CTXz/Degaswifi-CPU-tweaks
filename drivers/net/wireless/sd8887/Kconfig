@@ -1,0 +1,17 @@
+menuconfig MRVL_SD8887
+	tristate "Marvell sd8887 Driver"
+	default n
+
+config MRVL_SD8887_WIFI
+	tristate "Marvell sd8887_WIFI Driver"
+	depends on MRVL_SD8887
+	default n
+	---help---
+	  Marvell sd8887 wifi driver.
+
+config MRVL_SD8887_BT
+	tristate "Marvell sd8887_BT Driver"
+	depends on MRVL_SD8887
+	default n
+	---help---
+	  Marvell sd8887 bt driver.

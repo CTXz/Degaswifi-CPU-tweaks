@@ -1,0 +1,269 @@
+/*
+ * Eden FPGA Board
+ */
+
+/dts-v1/;
+/memreserve/ 0x09000000 0x04000000;	/* ION */
+/memreserve/ 0x17000000 0x017e8000;	/* default fb-mem (size: 1088*1920*4*3) */
+#include "eden.dtsi"
+
+/ {
+	model = "Eden";
+	compatible = "mrvl,eden-fpga", "mrvl,eden";
+
+	interrupt-parent = <&gic>;
+
+	memory@0 {
+		device_type = "memory";
+		reg = <0 0 0x20000000>;
+	};
+
+	gic: interrupt-controller@d1e02000 {
+		status = "okay";
+	};
+
+	ion {
+		status = "okay";
+		marvell,ion-nr = <2>;
+		marvell,ion-iommu = <1>;
+		heap1 {
+			marvell,ion-name = "carveout_heap";
+			marvell,ion-type = <2>;
+			marvell,ion-id = <2>;
+			marvell,ion-base = <0x09000000>;
+			marvell,ion-size = <0x04000000>;
+		};
+		heap2 {
+			marvell,ion-name = "system_heap";
+			marvell,ion-type = <0>;
+			marvell,ion-id = <0>;
+		};
+	};
+
+	board {
+		pll1_416_freq {
+			freq = <26000000>;
+		};
+		pll1_624_freq {
+			freq = <26000000>;
+		};
+	};
+
+	soc {
+		axi@d4200000 {
+			sdh3: sdh@d4280000 {
+				bus-width = <4>;
+				mrvl,clk-delay-cycles = <0x1f>;
+				wp-inverted;
+				status = "okay";
+			};
+
+			vdma: vdma@d427f000 {
+				marvell,vdma-num = <4>;
+				status = "okay";
+				vdma1 {
+					marvell,vdma-id = <0>;
+					marvell,sram-size = <15360>;
+					marvell,is_vid = <0>;
+				};
+				vdma2 {
+					marvell,vdma-id = <1>;
+					marvell,sram-size = <15360>;
+					marvell,is_vid = <0>;
+				};
+				vdma3 {
+					marvell,vdma-id = <2>;
+					marvell,sram-size = <15360>;
+					marvell,is_vid = <1>;
+				};
+				vdma4 {
+					marvell,vdma-id = <3>;
+					marvell,sram-size = <15360>;
+					marvell,is_vid = <1>;
+				};
+			};
+
+			apical: apical@d420b400 {
+				marvell,apical-num = <1>;
+				status = "okay";
+			};
+
+			disp: disp@d420b000 {
+				marvell,disp-name = "mmp_disp";
+				marvell,path-num = <1>;
+				status = "okay";
+				path1 {
+					marvell,path-name = "mmp_pnpath";
+					marvell,overlay-num = <2>;
+					marvell,overlay-table = <0>, <1>;
+					marvell,output-type = <0>;
+					marvell,link-config = <0x60000001>;
+					marvell,path-config = <0x20000000>;
+					pn_sclk_clksrc {
+						clksrc = "disp1";
+					};
+					disp1_clksrc {
+						clksrc = "pll1_416";
+					};
+					disp_apmu_ver {
+						version = "ax";
+					};
+				};
+			};
+
+			fb: fb {
+				marvell,fb-name = "mmp_fb";
+				marvell,path-name = "mmp_pnpath";
+				marvell,overlay-id = <1>;
+				marvell,default-pixfmt = <0x100>;
+				marvell,buffer-num = <3>;
+				marvell,fb-mem = <0x17000000>;
+				status = "okay";
+			};
+
+			fb1: fb-overlay {
+				marvell,fb-name = "mmp_fb_overlay";
+				marvell,path-name = "mmp_pnpath";
+				marvell,overlay-id = <0>;
+				status = "okay";
+			};
+			adma0: adma@c0ffd800 {
+				status = "okay";
+			};
+			adma1: adma@c0ffd900 {
+				status = "okay";
+			};
+		};
+
+		axi@f0400000 {
+			dec@0xf0400000 {
+				marvell,codec-type = <0>;
+				marvell,hw-capacity = <0>;
+				status = "okay";
+			};
+
+			pp@0xf0400000 {
+				marvell,codec-type = <1>;
+				marvell,hw-capacity = <0>;
+				status = "okay";
+			};
+
+			enc@0xf0400800 {
+				marvell,codec-type = <2>;
+				marvell,hw-capacity = <0>;
+				status = "okay";
+			};
+		};
+
+		apb@d4000000 {
+			/* PDMA Controller 0 */
+			pdma0: pdma@d4000000 {
+				status = "okay";
+			};
+
+			/* PDMA Controller 1 */
+			pdma1: pdma@d4008000 {
+				status = "okay";
+			};
+
+			uart1: uart@d4030000 {
+				status = "okay";
+
+				uart0_clksrc {
+					clksrc = "vctcxo";
+				};
+			};
+
+			twsi1: i2c@d4011000 {
+				status = "okay";
+				touch: bonnell@20 {
+					compatible = "synaptics,bonnell-touch";
+					reg = <0x20>;
+				};
+			};
+
+			gpio: gpio@d4019000 {
+				status = "okay";
+			};
+
+			rtc: rtc@d4010000 {
+				status = "okay";
+			};
+
+			/* SSPA port 0 */
+			sspa0: sspa@c0ffdc00 {
+				playback_period_bytes = <4096>;
+				playback_buffer_bytes = <12288>;
+				capture_period_bytes = <4096>;
+				capture_buffer_bytes = <12288>;
+				status = "okay";
+			};
+
+			/* SSPA port 1 */
+			sspa1: sspa@c0ffdd00 {
+				playback_period_bytes = <4096>;
+				playback_buffer_bytes = <12288>;
+				capture_period_bytes = <4096>;
+				capture_buffer_bytes = <12288>;
+				status = "okay";
+			};
+
+			map: map@c3000000 {
+				status = "okay";
+			};
+
+			sound {
+				compatible = "marvell,mmp-map-snd-card";
+				sspa-controllers = <&sspa0 &sspa1>;
+			};
+
+			twsi2: i2c@d4031000 {
+				/*pinctrl-names = "default"; pinctrl-0 = <&twsi2_pins>;*/
+				status = "okay";
+
+				codec1: 88pm860@38 {
+					compatible = "marvell,88pm860";
+					reg = <0x38>;
+				};
+			};
+
+			pmx: pinmux@d401e000 {
+				status = "okay";
+				/* pin base, nr pins & gpio function */
+				pinctrl-single,gpio-range = <EDEN_GPIO_PINMUX>;
+			};
+
+			timer: timer@d4080000 {
+				marvell,timer-fc_freq = <32768>;
+
+				counter0 {
+					marvell,timer-counter-cnt_freq = <32768>;
+				};
+
+				counter1 {
+					marvell,timer-counter-cnt_freq = <32768>;
+				};
+
+				counter2 {
+					marvell,timer-counter-cnt_freq = <32768>;
+				};
+			};
+		};
+	};
+
+	panel: td043mgea1 {
+		compatible = "marvell,mmp-td043mgea1";
+		marvell,path-name = "mmp_pnpath";
+		status = "okay";
+	};
+
+	smc91x: smc91x@80000300 {
+		compatible = "smsc,lan91c111";
+		reg = <0x0 0x80000300 0xffcff>;
+		interrupts = <0 63 0x1>;
+		rst_gpio = <&gpio GPIO(3) 0>;
+		clksrc = "smc91x";
+		status = "okay";
+	};
+
+};

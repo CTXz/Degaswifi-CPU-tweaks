@@ -1,0 +1,23 @@
+/dts-v1/;
+#include "pxa1L88-dkb.dtsi"
+/ {
+	compatible = "mrvl,pxa1L88-dkb-v20", "mrvl,pxa1L88";
+	soc {
+		axi@d4200000 {	/* AXI */
+			usbphy: usbphy@d4207000 {
+				status = "okay";
+			};
+		};
+		apb@d4000000 {
+			twsi2: i2c@d4037000 {
+				pmic1: 88pm822@30 {
+					usb: usb {
+						compatible = "marvell,88pm80x-usb";
+						vbus-gpio = <2>;
+						id-gpadc = <0xff>;
+					};
+				};
+			};
+		};
+	};
+};

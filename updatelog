@@ -1,0 +1,17 @@
+2013-7-24
+upgrade 3.10
+
+2013-7-25
+merge mrvl-3.9 irqchip and clocksource patch
+total 4 patches.
+
+2013-7-25
+merge mrvl-3.9 pxa988 smp boot patches
+total 3 patches.
+
+2013-7-25
+Merge mrvl-3.9 USB PHY patches
+total 13 patches.
+
+2013-7-25
+Merge mrvl-3.9 enable keypad devices with DT

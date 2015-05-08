@@ -1,0 +1,33 @@
+# arch/arm/boot/dts/Makefile.sec
+#
+# Copyright (C) 2014 Samsung Electronics Co, Ltd.
+#
+# This software is licensed under the terms of the GNU General Public
+# License version 2, as published by the Free Software Foundation, and
+# may be copied, distributed, and modified under those terms.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+dtb-$(CONFIG_MACH_MOUTAI) += pxa1l88-moutailte-r01.dtb
+dtb-$(CONFIG_MACH_KAVERI) +=pxa1l88-kaverilte-r00.dtb \
+			     pxa1l88-kaverilte-r01.dtb 
+dtb-$(CONFIG_MACH_AJANTA) += pxa1l88-ajantalte-r02.dtb 
+dtb-$(CONFIG_MACH_DEGAS) += pxa1088-degas3g-r00.dtb   \
+			     pxa1088-degas3g-r01.dtb   \
+			     pxa1088-degas3g-r02.dtb   \
+			     pxa1088-degas3g-r03.dtb   \
+			     pxa1088-degaswifi-r01.dtb   \
+			     pxa1088-degaswifi-r02.dtb   \
+			     pxa1088-degaswifi-r03.dtb   \
+			     pxa1088-degaswifiusa-r01.dtb   \
+			     pxa1088-degaswifiusa-r02.dtb   \
+			     pxa1088-degaswifiusa-r03.dtb
+dtb-$(CONFIG_MACH_AGERA) += pxa1l88-ageralte-r00.dtb  \
+			     pxa1l88-ageralte-r01.dtb  \
+			     pxa1l88-ageralte-r02.dtb  \
+			     pxa1l88-ageralte-r03.dtb  \
+			     pxa1l88-ageralte-r04.dtb 

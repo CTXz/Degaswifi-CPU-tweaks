@@ -1,0 +1,135 @@
+# drivers/sensors/Kconfig
+#
+# Copyright (C) 2013 Samsung Electronics Co, Ltd.
+#
+# This software is licensed under the terms of the GNU General Public
+# License version 2, as published by the Free Software Foundation, and
+# may be copied, distributed, and modified under those terms.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+config SENSORS
+        bool "Sensors Support"
+        help
+          Say Y to enable Sensors support.  This allows control of supported
+          Sensors.
+
+config CONFIG_SENSORS
+	tristate "Sensors core"
+	default n
+	help
+	  Say Y here to enable debugging messages for power supply class
+	  and drivers.
+
+config SENSORS_GP2A002S
+	tristate "gp2a proximity_sensor"
+	default n
+	help
+	  This option enables magnetic sensors using gp2a002s proximity driver.
+
+config SENSORS_GP2AP020A00F
+	depends on I2C
+	bool "Sharp GP2AP020A00F driver"
+	default n
+
+config SENSORS_GP2A030
+	depends on I2C
+	tristate "GP2AP030 driver"
+	default n
+	help
+	  This option enables proximity & light sensors using gp2ap030 driver.
+
+config SENSORS_BMA2X2
+	tristate "BMA255/BMA250E/BMA222E/BMA280 acceleration sensor support"
+	depends on I2C=y
+	help
+	  If you say yes here you get support for Bosch Sensortec's
+	  acceleration sensors BMA255/BMA250E/BMA222E/BMA280.
+
+config SENSORS_BMM050
+	tristate "BMM050 Magnetic Sensor Driver"
+	depends on I2C=y
+	help
+	 BMM050 Magnetic Sensor Driver implemented by Bosch-Sensortec.
+
+config INPUT_BMA2x2_ACC_ALERT_INT
+	tristate "BMA255/BMA250E/BMA222E/BMA280 acceleration sensor support"
+	depends on I2C=y
+	help
+	  If you say yes here you get support for Bosch Sensortec's
+	  acceleration sensors BMA255/BMA250E/BMA222E/BMA280.
+
+config SENSORS_BMA254
+	tristate "BMA254 Acceleration Sensor Driver"
+	depends on I2C
+	default n
+	help
+	  If you say yes here you get support for Bosch-Sensortec's
+	  BMA254 Acceleration Sensor.
+
+config INPUT_BMA254_ACC_ALERT_INT
+	tristate "BMA254 acceleration sensor motion support"
+	depends on SENSORS_BMA254
+	default n
+	help
+	  If you say yes here you get support for Bosch Sensortec's
+	  acceleration sensors BMA254 Motion support.
+
+config SENSORS_TMD27723
+	tristate "TMD27723 Proximity & Light Sensor Driver"
+	depends on I2C
+	default n
+	help
+	  If you say yes here you get support for TAOS's
+	  TMD27723 Proximity & Light Sensor.
+
+config SENSORS_GRIP_SX9500
+	depends on I2C
+	tristate "SEMTECH grip sensor driver"
+	default n
+	help
+	  Say Y here if you use GP2A_PROXIMITY.
+	  This option enables proximity sensors using
+	  SHARP GP2A_ANALOG device driver.
+
+	  Say N here if you do not use GRIP_SX9500.
+
+config SENSORS_ACCELOMETER_BMA25X
+	depends on I2C
+	tristate "BOSCH acceleromter sensor driver"
+	default n
+	help
+	  Say Y here if you use GP2A_PROXIMITY.
+	  This option enables proximity sensors using
+	  SHARP GP2A_ANALOG device driver.
+
+	  Say N here if you do not use SENSORS_ACCELOMETER_BMA25X.
+
+config COND_N_POWER_USE
+	bool "grip cond_n_power_use"
+	depends on SENSORS_GRIP_SX9500
+
+config SENSORS_SX9500_INIT_TOUCH_THRESHOLD
+	int "SX9500 Grip sensor threshold for init touch"
+	depends on SENSORS_GRIP_SX9500
+	default "3000"
+	help
+	  This value is the standard of init touch using
+	  SemTech sx9500 device driver.
+
+config SENSORS_SX9500_NORMAL_TOUCH_THRESHOLD
+	int "SX9500 Grip sensor threshold for normal touch"
+	depends on SENSORS_GRIP_SX9500
+	default "17"
+	help
+	  This value is the standard of normal touch using
+	  SemTech sx9500 device driver.
+
+config SENSOR_USE_SYMLINK
+	bool "sensors_symlink"
+	depends on I2C
+
