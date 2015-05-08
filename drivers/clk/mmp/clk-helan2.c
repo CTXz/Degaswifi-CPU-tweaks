@@ -110,7 +110,7 @@ static DEFINE_SPINLOCK(rtc_lock);
 #define LCD_PN_SCLK	(0xd420b1a8)
 
 enum {
-	CORE_1p2G = 1183,
+	CORE_1p2G = 1248,
 	CORE_1p5G = 1482,
 };
 

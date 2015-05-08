@@ -54,7 +54,7 @@ static unsigned int uidro;
 /* components frequency combination */
 /* FIXME: below freq-cmb and svc should be adjusted after SVC is avaliable */
 static unsigned long freqs_cmb_1u88a0[VM_RAIL_MAX][VL_MAX] = {
-	{ 312000, 624000, 800000, 1183000 },	/* CORE */
+	{ 312000, 624000, 800000, 1248000 },	/* CORE */
 	{ 312000, 400000, 400000, 533000 },	/* DDR */
 	{ 208000, 208000, 312000, 312000 },	/* AXI */
 	{ 0, 416000, 624000, 624000 },		/* GC3D */
