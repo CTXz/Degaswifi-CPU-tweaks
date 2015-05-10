@@ -110,7 +110,7 @@ static DEFINE_SPINLOCK(rtc_lock);
 #define LCD_PN_SCLK	(0xd420b1a8)
 
 enum {
-	CORE_1p2G = 1248,
+	CORE_1p2G = 1344,
 	CORE_1p5G = 1482,
 };
 
@@ -556,7 +556,7 @@ static void __init helan2_pll_init(void *mpmu_base, void *apbs_base,
 	clk_register_clkdev(clk, "pll1_832m", NULL);
 
 	clk = clk_register_fixed_rate(NULL, "pll1_1248", NULL, CLK_IS_ROOT,
-				1248000000);
+				1344000000);
 	clk_register_clkdev(clk, "pll1_1248", NULL);
 
 	/* pll1_416/624/832 clock which has d1p gating feature */
@@ -847,7 +847,7 @@ static struct core_reg_offset corefc_reg_off = {
 static struct cpu_rtcwtc cpu_rtcwtc_1x88[] = {
 	{.max_pclk = 624, .l1_rtc = 0x02222222, .l2_rtc = 0x00002221,},
 	{.max_pclk = 1066, .l1_rtc = 0x02666666, .l2_rtc = 0x00006265,},
-	{.max_pclk = 1283, .l1_rtc = 0x2AAAAAA, .l2_rtc = 0x0000A2A9,},
+	{.max_pclk = 1344, .l1_rtc = 0x2AAAAAA, .l2_rtc = 0x0000A2A9,},
 	{.max_pclk = 1482, .l1_rtc = 0x02EEEEEE, .l2_rtc = 0x0000E2ED,},
 };
 
@@ -923,9 +923,9 @@ static struct cpu_opt helan2_op_array[] = {
 		.ap_clk_sel = 0x5,
 	},
 	{
-		.pclk = 1248,
-		.pdclk = 624,
-		.baclk = 312,
+		.pclk = 1344,
+		.pdclk = 672,
+		.baclk = 336,
 		.ap_clk_sel = 0x1,
 	},
 };
@@ -940,7 +940,7 @@ static struct core_params helan2_core_params = {
 	.cpu_rtcwtc_table = cpu_rtcwtc_1x88,
 	.cpu_rtcwtc_table_size = ARRAY_SIZE(cpu_rtcwtc_1x88),
 #endif
-	.max_cpurate = 1248,
+	.max_cpurate = 1344,
 	.dcstat_support = true,
 };
 

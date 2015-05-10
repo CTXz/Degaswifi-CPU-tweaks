@@ -6,8 +6,8 @@
 #include <linux/clkdev.h>
 
 enum {
-	CORE_1p2G = 1248,
-	CORE_1p25G = 1248,
+	CORE_1p2G = 1344,
+	CORE_1p25G = 1344,
 	CORE_1p5G = 1482,
 };
 

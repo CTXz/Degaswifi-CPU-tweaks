@@ -623,7 +623,7 @@ void __init pxa988_pll_init(void *mpmu_base, void *apbs_base, void *apmu_base)
 		clk_register_clkdev(clk, "pll1_832m", NULL);
 	}
 	clk = clk_register_fixed_rate(NULL, "pll1_1248", NULL, CLK_IS_ROOT,
-				1248000000);
+				1344000000);
 	clk_register_clkdev(clk, "pll1_1248", NULL);
 
 	/* pll1_416/624 clock which has d1p gating feature */
@@ -862,7 +862,7 @@ struct core_reg_offset pxa988_reg_off = {
 static struct cpu_rtcwtc cpu_rtcwtc_1088[] = {
 	{.max_pclk = 312, .l1_rtc = 0x02222222, .l2_rtc = 0x00002221,},
 	{.max_pclk = 800, .l1_rtc = 0x02666666, .l2_rtc = 0x00006265,},
-	{.max_pclk = 1248, .l1_rtc = 0x2AAAAAA, .l2_rtc = 0x0000A2A9,},
+	{.max_pclk = 1344, .l1_rtc = 0x2AAAAAA, .l2_rtc = 0x0000A2A9,},
 	{.max_pclk = 1482, .l1_rtc = 0x02EEEEEE, .l2_rtc = 0x0000E2ED,},
 };
 
@@ -933,9 +933,9 @@ static struct cpu_opt pxa1x88_op_array[] = {
 		.ap_clk_sel = AP_CLK_SRC_PLL3P,
 	},
 	{
-		.pclk = 1248,
-		.pdclk = 624,
-		.baclk = 312,
+		.pclk = 1344,
+		.pdclk = 672,
+		.baclk = 336,
 		.ap_clk_sel = AP_CLK_SRC_PLL1_1248,
 	},
 	{
@@ -954,7 +954,7 @@ struct core_params pxa1x88_core_params = {
 	.cpu_opt_size = ARRAY_SIZE(pxa1x88_op_array),
 	.cpu_rtcwtc_table = cpu_rtcwtc_1x88,
 	.cpu_rtcwtc_table_size = ARRAY_SIZE(cpu_rtcwtc_1x88),
-	.max_cpurate = 1248,
+	.max_cpurate = 1344,
 	.dcstat_support = true,
 	.shared_lock = &pll3_lock,
 };
