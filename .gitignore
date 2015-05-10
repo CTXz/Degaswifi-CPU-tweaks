@@ -1,0 +1,129 @@
+#
+# NOTE! Don't add files that are generated in specific
+# subdirectories here. Add them in the ".gitignore" file
+# in that subdirectory instead.
+#
+# NOTE! Please use 'git ls-files -i --exclude-standard'
+# command after changing this file, to see if there are
+# any tracked files which get ignored after the change.
+#
+# Normal rules
+#
+.*
+*.o
+*.o.*
+*.a
+*.s
+*.ko
+*.so
+*.so.dbg
+*.mod.c
+*.i
+*.lst
+*.symtypes
+*.order
+modules.builtin
+*.elf
+*.bin
+*.gz
+*.bz2
+*.lzma
+*.xz
+*.lzo
+*.patch
+*.gcno
+*.dtb
+
+#
+# Top-level generic files
+#
+/tags
+/TAGS
+/linux
+/vmlinux
+/vmlinuz
+/System.map
+/Module.markers
+/Module.symvers
+
+#
+# Debian directory (make deb-pkg)
+#
+/debian/
+
+#
+# git files that we don't want to ignore even it they are dot-files
+#
+!.gitignore
+!.mailmap
+
+#
+# Generated include files
+#
+include/config
+include/linux/version.h
+include/generated
+arch/*/include/generated
+
+# stgit generated dirs
+patches-*
+
+# quilt's files
+patches
+series
+
+# cscope files
+cscope.*
+ncscope.*
+
+# gnu global files
+GPATH
+GRTAGS
+GSYMS
+GTAGS
+
+*.orig
+*~
+\#*#
+
+# output dir
+out
+
+# other stuff
+arch/arm/boot/Image
+arch/arm/boot/compressed/ashldi3.S
+arch/arm/boot/compressed/hyp-stub.S
+arch/arm/boot/compressed/lib1funcs.S
+arch/arm/boot/compressed/piggy.gzip
+arch/arm/boot/compressed/vmlinux
+arch/arm/boot/compressed/vmlinux.lds
+arch/arm/boot/zImage
+arch/arm/kernel/vmlinux.lds
+drivers/video/logo/clut_vga16.c
+drivers/video/logo/logo_android_clut224.c
+drivers/video/logo/logo_blackfin_clut224.c
+drivers/video/logo/logo_blackfin_vga16.c
+drivers/video/logo/logo_dec_clut224.c
+drivers/video/logo/logo_linux_clut224.c
+drivers/video/logo/logo_linux_mono.c
+drivers/video/logo/logo_linux_vga16.c
+drivers/video/logo/logo_m32r_clut224.c
+drivers/video/logo/logo_mac_clut224.c
+drivers/video/logo/logo_parisc_clut224.c
+drivers/video/logo/logo_sgi_clut224.c
+drivers/video/logo/logo_spe_clut224.c
+drivers/video/logo/logo_sun_clut224.c
+drivers/video/logo/logo_superh_clut224.c
+drivers/video/logo/logo_superh_mono.c
+drivers/video/logo/logo_superh_vga16.c
+kernel/gitinfo.S
+kernel/hz.bc
+kernel/timeconst.h
+lib/crc32table.h
+lib/gen_crc32table
+lib/oid_registry_data.c
+net/wireless/regdb.c
+security/selinux/av_permissions.h
+security/selinux/flask.h
+usr/gen_init_cpio
+usr/initramfs_data.cpio
