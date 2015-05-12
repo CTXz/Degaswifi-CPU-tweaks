@@ -54,7 +54,7 @@ static int is_1p5G_chip;
 
 /* components frequency combination */
 static unsigned long freqs_cmb_1L88a0[][VL_MAX] = {
-	{ 312000, 624000, 800000, 1248000 },	/* CORE */
+	{ 312000, 624000, 800000, 1444000 },	/* CORE */
 	{ 312000, 400000, 400000, 533000 },	/* DDR */
 	{ 200000, 200000, 266000, 312000 },	/* AXI */
 	{ 0, 0, 624000, 624000 },		/* GC */
@@ -65,7 +65,7 @@ static unsigned long freqs_cmb_1L88a0[][VL_MAX] = {
 };
 
 static unsigned long freqs_cmb_1L88a0c[VM_RAIL_MAX][VL_MAX] = {
-	{ 312000, 624000, 800000, 1482000 },	/* CORE */
+	{ 312000, 624000, 800000, 1444000 },	/* CORE */
 	{ 312000, 400000, 400000, 533000 },	/* DDR/AXI */
 	{ 156000, 200000, 266000, 312000 },	/* AXI */
 	{ 0, 0, 624000, 624000 },		/* GC */
