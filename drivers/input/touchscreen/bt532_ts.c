@@ -4484,7 +4484,7 @@ static int bt532_ts_probe(struct i2c_client *client,
 	}
 	pdata->tsp_irq = info->irq;
 	ret = request_threaded_irq(info->irq, NULL, bt532_touch_work,
-		IRQF_TRIGGER_FALLING | IRQF_ONESHOT , BT532_TS_DEVICE, info);
+	IRQF_TRIGGER_FALLING | IRQF_ONESHOT | IRQF_NO_SUSPEND | IRQF_EARLY_RESUME , BT532_TS_DEVICE, info);
 
 	if (ret) {
 		printk(KERN_ERR "unable to register irq.(%s)\r\n",

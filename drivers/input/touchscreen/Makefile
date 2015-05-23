@@ -4,6 +4,9 @@
 
 # Each configuration option enables a list of files.
 
+# for sweep2wake, leave 1st to avoid merge issues at the end of the file
+obj-$(CONFIG_TOUCHSCREEN_SWEEP2WAKE)                += sweep2wake.o
+
 wm97xx-ts-y := wm97xx-core.o
 
 obj-$(CONFIG_TOUCHSCREEN_88PM860X)	+= 88pm860x-ts.o
