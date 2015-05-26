@@ -58,10 +58,10 @@ MODULE_LICENSE("GPLv2");
 #define S2W_PWRKEY_DUR          50
 
 #define DEFAULT_S2W_Y_MAX               1024
-#define DEFAULT_S2W_X_MAX               600
+#define DEFAULT_S2W_X_MAX               800
 #define DEFAULT_S2W_Y_LIMIT             DEFAULT_S2W_Y_MAX-150
 #define DEFAULT_S2W_X_B1                130
-#define DEFAULT_S2W_X_B2                300
+#define DEFAULT_S2W_X_B2                650
 #define DEFAULT_S2W_X_FINAL             130
 
 /* Resources */
